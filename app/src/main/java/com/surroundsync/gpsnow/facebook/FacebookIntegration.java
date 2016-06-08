@@ -51,7 +51,7 @@ public class FacebookIntegration extends AppCompatActivity {
                     public void onCompleted(JSONObject jsonObject, GraphResponse graphResponse) {
                         try {
                             String userId = loginResult.getAccessToken().getUserId();
-
+                            String userName=jsonObject.getString("name").toString();
                             // JSONObject data = graphResponse.getJSONObject();
                             //info.setText(jsonObject.getString("name"));
                             //tvEmail.setText(jsonObject.getString("email"));
@@ -65,7 +65,7 @@ public class FacebookIntegration extends AppCompatActivity {
 
                 request.setParameters(params);
                 request.executeAsync();
-                Toast.makeText(getBaseContext(),"login Successful", LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(),"Login Successful", LENGTH_SHORT).show();
 
             }
 
