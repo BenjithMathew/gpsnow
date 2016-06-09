@@ -1,0 +1,73 @@
+{
+  "project_info": {
+    "project_number": "402095586877",
+    "firebase_url": "https://gpstodo.firebaseio.com",
+    "project_id": "project-7588763826829611513",
+    "storage_bucket": "project-7588763826829611513.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:402095586877:android:7a1b44d998814fa6",
+        "android_client_info": {
+          "package_name": "com.example.ashrayjoshi.gps"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "402095586877-f2m726d57du5unsjagcqp64hnpeocour.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA7kRWVfv3UOISIU8lbQbcj3tUKTn-saCQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:402095586877:android:72533b9abcf7bfd7",
+        "android_client_info": {
+          "package_name": "com.surroundsync.gpsnow"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "402095586877-f2m726d57du5unsjagcqp64hnpeocour.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA7kRWVfv3UOISIU8lbQbcj3tUKTn-saCQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

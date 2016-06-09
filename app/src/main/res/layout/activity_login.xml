@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.surroundsync.gpsnow.LoginActivity" >
+
+    <EditText
+        android:id="@+id/activity_et_email_login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:ems="10"
+        android:inputType="textEmailAddress"
+        android:hint="@string/email_hint" >
+
+        <requestFocus />
+    </EditText>
+
+    <EditText
+        android:id="@+id/activity_et_pass_login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/activity_et_email_login"
+        android:layout_below="@+id/activity_et_email_login"
+        android:ems="10"
+        android:hint="@string/password_hint"
+        android:inputType="textPassword" />
+
+    <Button
+        android:id="@+id/activity_btn_login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/activity_et_pass_login"
+        android:layout_below="@+id/activity_et_pass_login"
+        android:text="@string/login_button_label" />
+
+
+</RelativeLayout>

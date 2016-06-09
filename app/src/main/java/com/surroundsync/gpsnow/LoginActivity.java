@@ -1,7 +1,9 @@
 package com.surroundsync.gpsnow;
 
+
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -16,82 +18,56 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-
-
-
-
-
-public class MainActivity extends BaseActivity implements
+public class LoginActivity extends AppCompatActivity implements
         View.OnClickListener {
 
     private static final String TAG = "EmailPassword";
 
-    private TextView mStatusTextView;
-    private TextView mDetailTextView;
     private EditText mEmailField;
     private EditText mPasswordField;
-    private Button email_create_account_button;
-    private Button email_sign_in_button;
+    private Button LoginButton;
 
-    // [START declare_auth]
+
     private FirebaseAuth mAuth;
-    // [END declare_auth]
 
-    // [START declare_auth_listener]
     private FirebaseAuth.AuthStateListener mAuthListener;
-    // [END declare_auth_listener]
+    // [END ]
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_login);
 
-        // Views
-        mStatusTextView = (TextView) findViewById(R.id.status);
-        mDetailTextView = (TextView) findViewById(R.id.detail);
-        mEmailField = (EditText) findViewById(R.id.field_email);
-        mPasswordField = (EditText) findViewById(R.id.field_password);
 
-        // Buttons
-        email_sign_in_button=(Button) findViewById(R.id.email_sign_in_button);
-        email_create_account_button=(Button) findViewById(R.id.email_create_account_button);
+        mEmailField = (EditText) findViewById(R.id.activity_et_email_login);
+        mPasswordField = (EditText) findViewById(R.id.activity_et_pass_login);
 
-        email_create_account_button.setOnClickListener(this);
-        email_sign_in_button.setOnClickListener(this);
 
-        // [START initialize_auth]
+        LoginButton=(Button) findViewById(R.id.activity_btn_login);
+
+
         mAuth = FirebaseAuth.getInstance();
-        // [END initialize_auth]
 
-        // [START auth_state_listener]
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
-                    // User is signed in
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
                 } else {
-                    // User is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");
                 }
-                // [START_EXCLUDE]
-                updateUI(user);
-                // [END_EXCLUDE]
+
             }
         };
-        // [END auth_state_listener]
     }
 
-    // [START on_start_add_listener]
     @Override
     public void onStart() {
         super.onStart();
         mAuth.addAuthStateListener(mAuthListener);
     }
-    // [END on_start_add_listener]
 
-    // [START on_stop_remove_listener]
     @Override
     public void onStop() {
         super.onStop();
@@ -99,38 +75,8 @@ public class MainActivity extends BaseActivity implements
             mAuth.removeAuthStateListener(mAuthListener);
         }
     }
-    // [END on_stop_remove_listener]
 
-    private void createAccount(String email, String password) {
-        Log.d(TAG, "createAccount:" + email);
-        if (!validateForm()) {
-            return;
-        }
 
-        showProgressDialog();
-
-        // [START create_user_with_email]
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(TAG, "createUserWithEmail:onComplete:" + task.isSuccessful());
-
-                        // If sign in fails, display a message to the user. If sign in succeeds
-                        // the auth state listener will be notified and logic to handle the
-                        // signed in user can be handled in the listener.
-                        if (!task.isSuccessful()) {
-                            Toast.makeText(MainActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-
-                        // [START_EXCLUDE]
-                        hideProgressDialog();
-                        // [END_EXCLUDE]
-                    }
-                });
-        // [END create_user_with_email]
-    }
 
     private void signIn(String email, String password) {
         Log.d(TAG, "signIn:" + email);
@@ -138,9 +84,8 @@ public class MainActivity extends BaseActivity implements
             return;
         }
 
-        showProgressDialog();
 
-        // [START sign_in_with_email]
+
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -152,16 +97,13 @@ public class MainActivity extends BaseActivity implements
                         // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
                             Log.w(TAG, "signInWithEmail", task.getException());
-                            Toast.makeText(MainActivity.this, "Authentication failed.",
+                            Toast.makeText(LoginActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         }
 
-                        // [START_EXCLUDE]
-                        hideProgressDialog();
-                        // [END_EXCLUDE]
+
                     }
                 });
-        // [END sign_in_with_email]
     }
 
 
@@ -187,8 +129,7 @@ public class MainActivity extends BaseActivity implements
 
         return valid;
     }
-
-    private void updateUI(FirebaseUser user) {
+    /*private void updateUI(FirebaseUser user) {
         hideProgressDialog();
         if (user != null) {
             mStatusTextView.setText(getString(R.string.emailpassword_status_fmt, user.getEmail()));
@@ -203,15 +144,12 @@ public class MainActivity extends BaseActivity implements
             findViewById(R.id.email_password_buttons).setVisibility(View.VISIBLE);
             findViewById(R.id.email_password_fields).setVisibility(View.VISIBLE);
         }
-    }
+    }*/
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.email_create_account_button:
-                createAccount(mEmailField.getText().toString(), mPasswordField.getText().toString());
-                break;
-            case R.id.email_sign_in_button:
+                 case R.id.activity_btn_login:
                 signIn(mEmailField.getText().toString(), mPasswordField.getText().toString());
                 break;
 
