@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.surroundsync.gpsnow.registration.NewUserRegistration">
+    <EditText
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Name"
+        android:inputType="textPersonName"
+        android:id="@+id/activity_new_user_registartion_et_name"
+        android:fitsSystemWindows="true"
+        android:singleLine="true"/>
+    ​
+    ​
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:singleLine="true"
+        android:id="@+id/activity_new_user_registartion_et_email"
+        android:hint="email"
+        android:inputType="textEmailAddress"
+        android:layout_below="@+id/activity_new_user_registartion_et_name" />
+    <EditText
+        android:id="@+id/activity_new_user_registartion_et_username"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="User Name"
+        android:singleLine="true"
+        android:layout_below="@+id/activity_new_user_registartion_et_email"/>
+    ​
+    ​
+
+    <EditText
+        android:id="@+id/activity_new_user_registartion_et_password"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Password"
+        android:inputType="textPassword"
+        android:fitsSystemWindows="true"
+        android:singleLine="true"
+        android:layout_below="@+id/activity_new_user_registartion_et_username"
+        android:layout_centerHorizontal="true" />
+
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Save"
+        android:id="@+id/activity_new_user_registartion_btn_save"
+        android:fitsSystemWindows="true"
+        android:layout_below="@+id/activity_new_user_registartion_et_password" />
+
+
+</RelativeLayout>
