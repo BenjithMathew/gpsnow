@@ -5,10 +5,11 @@
     android:layout_height="match_parent"
     tools:context="com.surroundsync.gpsnow.registration.NewUserRegistration">
     <EditText
-        android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Name"
+        android:gravity="center"
+
         android:inputType="textPersonName"
         android:id="@+id/activity_new_user_registartion_et_name"
         android:fitsSystemWindows="true"
@@ -19,18 +20,18 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
         android:singleLine="true"
         android:id="@+id/activity_new_user_registartion_et_email"
         android:hint="email"
+        android:gravity="center"
         android:inputType="textEmailAddress"
         android:layout_below="@+id/activity_new_user_registartion_et_name" />
     <EditText
         android:id="@+id/activity_new_user_registartion_et_username"
-        android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="User Name"
+        android:gravity="center"
         android:singleLine="true"
         android:layout_below="@+id/activity_new_user_registartion_et_email"/>
     ​
@@ -38,11 +39,11 @@
 
     <EditText
         android:id="@+id/activity_new_user_registartion_et_password"
-        android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Password"
         android:inputType="textPassword"
+        android:gravity="center"
         android:fitsSystemWindows="true"
         android:singleLine="true"
         android:layout_below="@+id/activity_new_user_registartion_et_username"
@@ -55,7 +56,32 @@
         android:text="Save"
         android:id="@+id/activity_new_user_registartion_btn_save"
         android:fitsSystemWindows="true"
-        android:layout_below="@+id/activity_new_user_registartion_et_password" />
+        android:layout_below="@+id/activity_new_user_registration_tv_password_checker"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="29dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/activity_new_user_registration_tv_password_checker"
+        android:layout_below="@+id/activity_new_user_registartion_et_password"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/activity_new_user_registration_pb_progressbar"
+        android:max="100"
+        android:progress="0"
+        android:indeterminate="false"
+        android:layout_below="@+id/activity_new_user_registration_tv_password_checker"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
 
 
 </RelativeLayout>
