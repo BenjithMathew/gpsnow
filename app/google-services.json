@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "829038630846",
+    "project_id": "gpsnow-d063f"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:829038630846:android:72533b9abcf7bfd7",
+        "android_client_info": {
+          "package_name": "com.surroundsync.gpsnow"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "829038630846-8dh1kkte5pt9bv29de7ptc78vik1dk0d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.surroundsync.gpsnow",
+            "certificate_hash": "ADCCBF88BC36C0DFA89F76F891B646865223BE8A"
+          }
+        },
+        {
+          "client_id": "829038630846-6njgqe9nlse3riuldcdohgdo0nufkqls.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOZgyq2uv6jAo_7UP-jaSoX8f7xSXZmkA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
