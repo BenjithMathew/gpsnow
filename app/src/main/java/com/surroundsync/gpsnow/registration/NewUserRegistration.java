@@ -155,7 +155,7 @@ public class NewUserRegistration extends Activity implements View.OnClickListene
     public void onClick(View v) {
 
         name = etName.getText().toString();
-        userName = etUserName.getText().toString();
+        userName = etUserName.getText().toString().trim();
         email = etEmail.getText().toString();
         password = etPassword.getText().toString();
 
