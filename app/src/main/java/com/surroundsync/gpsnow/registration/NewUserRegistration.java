@@ -35,17 +35,17 @@ public class NewUserRegistration extends Activity implements View.OnClickListene
 
     private EditText etName, etUserName, etEmail, etPassword;
     private TextView tvPasswordChecker;
-    Button btnSave;
+    private Button btnSave;
     private static boolean flag = false;
-    String name;
-    String userName;
-    String email;
-    String password;
+    private String name;
+    private String userName;
+    private String email;
+    private String password;
     private Pattern pattern;
     private Matcher matcher;
     private static final String PASSWORD_PATTERN = "((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%]).{5,15})";
-    DatabaseReference rootReference = FirebaseDatabase.getInstance().getReference();
-    DatabaseReference ref = rootReference.child("gpsnow");
+    private DatabaseReference rootReference = FirebaseDatabase.getInstance().getReference();
+    private DatabaseReference ref = rootReference.child("gpsnow");
     ProgressBar pbPassword;
 
     @Override
@@ -117,7 +117,7 @@ public class NewUserRegistration extends Activity implements View.OnClickListene
 
     //password evaluation with seekbar
     public void passwordEvaluation(Editable s) {
-        if ((s.length() > 0) && (s.length() <=5)) {
+        if ((s.length() > 0) && (s.length() <= 5)) {
             pbPassword.setVisibility(View.VISIBLE);
             pbPassword.getProgressDrawable().setColorFilter(
                     Color.parseColor("#ff0000"), android.graphics.PorterDuff.Mode.SRC_IN);
@@ -230,7 +230,7 @@ public class NewUserRegistration extends Activity implements View.OnClickListene
                     etEmail.setText("");
                     etPassword.setText("");
                     etUserName.setText("");
-                    Toast.makeText(NewUserRegistration.this, "Login Successful", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(NewUserRegistration.this, "Registration Successful", Toast.LENGTH_SHORT).show();
                 }
             }
 
