@@ -89,13 +89,27 @@ public class FacebookIntegration extends AppCompatActivity {
                                 return;
                             }
                             locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                            Boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+                            Boolean isNetworkEnabled = locationManager
+                                    .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
                             criteria = new Criteria();
                             provider = locationManager.getBestProvider(criteria, false);
                             location = locationManager.getLastKnownLocation(provider);
-                            double latitude = location.getLatitude();
-                            currentLatitude = String.valueOf(latitude);
-                            double longitude = location.getLongitude();
-                            currentLongitude = String.valueOf(longitude);
+
+                            if (!isNetworkEnabled) {
+                                Toast.makeText(getBaseContext(), "Network is not available", Toast.LENGTH_SHORT).show();
+                            }
+                            if (!isGPSEnabled) {
+                                Toast.makeText(getBaseContext(), "Location is not available..! Turn ON your Location", Toast.LENGTH_SHORT).show();
+                            } else {
+                                double latitude = location.getLatitude();
+                                currentLatitude = String.valueOf(latitude);
+                                double longitude = location.getLongitude();
+                                currentLongitude = String.valueOf(longitude);
+
+                            }
+
+
 
                             userId = loginResult.getAccessToken().getUserId();
                             userName = jsonObject.getString("name").toString();
