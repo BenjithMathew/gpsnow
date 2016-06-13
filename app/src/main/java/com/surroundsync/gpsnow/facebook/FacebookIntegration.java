@@ -55,8 +55,8 @@ public class FacebookIntegration extends AppCompatActivity implements LocationLi
     private String currentLongitude = null;
     private double latitude = 0.0;
     private double longitude = 0.0;
-    private Boolean isGPSEnabled;
-    private Boolean isNetworkEnabled;
+    private Boolean isGPSEnabled = false;
+    private Boolean isNetworkEnabled = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,13 +142,10 @@ public class FacebookIntegration extends AppCompatActivity implements LocationLi
                                             @Override
                                             public void onDataChange(DataSnapshot dataSnapshot) {
                                                 Map<String, Object> map = new HashMap<>();
-                                                map.put("name", userName);
-                                                map.put("userId", userId);
-                                                map.put("source", "fb");
                                                 map.put("latitude", currentLatitude);
                                                 map.put("longitude", currentLongitude);
                                                 map.put("status", false);
-                                                ref.child("login").child(userId).setValue(map);
+                                                ref.child("login").child(userId).updateChildren(map);
                                             }
 
                                             @Override
