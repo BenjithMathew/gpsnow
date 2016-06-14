@@ -34,9 +34,17 @@ import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.surroundsync.gpsnow.R;
+import com.surroundsync.gpsnow.loadingdatatomap.FetchingDataFromFirebase;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.security.Provider;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class GoolePlus extends AppCompatActivity implements View.OnClickListener,
@@ -50,7 +58,7 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
 
     DatabaseReference ref = mRootRef.child("gpsnow");*/
 
-    Firebase ref;
+    public static Firebase ref;
 
     private static final String TAG = "SignInActivity";
 
@@ -59,8 +67,6 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
     private SignInButton googleplus_signin_button;
 
     private Button googleplus_signout_button;
-
-    private EditText etGooglename, etGoogleemail, etGoogleID;
 
     private ProgressDialog mProgressDialog;
 
@@ -89,6 +95,10 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
     private boolean isGPSenabled;
 
     boolean isNetworkEnabled;
+
+    FetchingDataFromFirebase fetchData;
+
+    //String x= null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,6 +141,7 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
             return;
         }
         location = locationManager.getLastKnownLocation(provider);
+        Log.d("loaction", " " + location);
 
         //--------------for signiin button---------
         googleplus_signin_button = (SignInButton) findViewById(R.id.activity_googleplus_btn_signin);
@@ -139,13 +150,11 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
         googleplus_signin_button.setColorScheme(SignInButton.COLOR_DARK);
         googleplus_signin_button.setScopes(gso.getScopeArray());
 
+        fetchData =new FetchingDataFromFirebase();
+
         //-----------------------
 
         googleplus_signout_button = (Button) findViewById(R.id.activity_googleplus_btn_signout);
-        etGooglename = (EditText) findViewById(R.id.activity_etgplus_name);
-        etGoogleemail = (EditText) findViewById(R.id.activity_etgplus_email);
-        etGoogleID = (EditText) findViewById(R.id.activity_etgplus_ID);
-
 
         googleplus_signin_button.setOnClickListener(this);
         googleplus_signout_button.setOnClickListener(this);
@@ -176,7 +185,7 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
                 }
             });
         }
-        //mGoogleApiClient.connect();
+
     }
 
 
@@ -230,9 +239,6 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
                         // [END_EXCLUDE]
                     }
                 });
-        etGooglename.setText("");
-        etGoogleemail.setText("");
-        etGoogleID.setText("");
 
         status = false;
 
@@ -247,7 +253,7 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
                 loadData.put("name", displayName);
                 loadData.put("source", "g+");
                 loadData.put("status", status);
-                loadData.put("userId", userId);
+                loadData.put("username", userId);
 
                 ref.child(userId).setValue(loadData);
 
@@ -279,6 +285,7 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
         } else {
             googleplus_signin_button.setVisibility(View.VISIBLE);
             googleplus_signout_button.setVisibility(View.GONE);
+
         }
     }
 
@@ -311,9 +318,6 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
             final GoogleSignInAccount acct = result.getSignInAccount();
-            etGooglename.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
-            etGoogleemail.setText(acct.getEmail());
-            etGoogleID.setText(acct.getId());
 
             status = true;
 
@@ -333,7 +337,8 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
                     loadData.put("name", displayName);
                     loadData.put("source", "g+");
                     loadData.put("status", status);
-                    loadData.put("userId", acct.getId());
+                    loadData.put("username", acct.getId());
+
 
                     ref.child(acct.getId()).setValue(loadData);
                 }
@@ -349,6 +354,10 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
             // Signed out, show unauthenticated UI.
             updateUI(false);
         }
+
+
+        // for fetching details from evrry child nodes of the firebase database
+        fetchData.firebaseData();
     }
 
 
