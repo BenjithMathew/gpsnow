@@ -65,6 +65,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });*/
 
+        locationManager= (LocationManager) getSystemService(LOCATION_SERVICE);
+        locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        criteria=new Criteria();
+        provider=locationManager.getBestProvider(criteria,false);
+        location=locationManager.getLastKnownLocation(provider);
+        double lattitude=location.getLatitude();
+        double longitude=location.getLongitude();
+        stringLatitude=String.valueOf(lattitude);
+        stringLongitude=String.valueOf(longitude);
+
         btnLogin.setOnClickListener(new View.OnClickListener() {
 
 
@@ -92,10 +103,13 @@ public class MainActivity extends AppCompatActivity {
                                         Toast.makeText(MainActivity.this, "validation success.", Toast.LENGTH_SHORT).show();
                                         HashMap<String, Object> result = new HashMap<>();
                                         result.put("username", userName);
+                                        result.put("latitude",stringLatitude);
+                                        result.put("longitude",stringLongitude);
                                         result.put("name",nameFromServer);
                                         result.put("status",loginStatus);
                                         userChildRef.child("login").child(userName).setValue(result);
                                         Intent intent= new Intent(getBaseContext(),Main2Activity.class);
+                                        intent.putExtra("username",userName);
                                         startActivity(intent);
 
 
