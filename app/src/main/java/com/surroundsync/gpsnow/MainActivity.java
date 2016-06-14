@@ -1,12 +1,10 @@
 package com.surroundsync.gpsnow;
 
-import android.content.Context;
-import android.content.pm.PackageManager;
+import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -92,36 +90,18 @@ public class MainActivity extends AppCompatActivity {
                                     if (passwordFromServer.equals(password)) {
                                         loginStatus = true;
                                         Toast.makeText(MainActivity.this, "validation success.", Toast.LENGTH_SHORT).show();
-                                        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                                        criteria = new Criteria();
-                                        provider = locationManager.getBestProvider(criteria, false);
-
-                                        if (ActivityCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                                            // TODO: Consider calling
-                                            //    ActivityCompat#requestPermissions
-                                            // here to request the missing permissions, and then overriding
-                                            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                                            //                                          int[] grantResults)
-                                            // to handle the case where the user grants the permission. See the documentation
-                                            // for ActivityCompat#requestPermissions for more details.
-                                            return;
-                                        }
-                                        location = locationManager.getLastKnownLocation(provider);
-                                        double latitude = location.getLatitude();
-                                        stringLatitude = String.valueOf(latitude);
-                                        double longitude = location.getLongitude();
-                                        stringLongitude = String.valueOf(longitude);
                                         HashMap<String, Object> result = new HashMap<>();
                                         result.put("username", userName);
                                         result.put("name",nameFromServer);
                                         result.put("status",loginStatus);
-                                        result.put("Latitude",stringLatitude);
-                                        result.put("Longitude",stringLongitude);
                                         userChildRef.child("login").child(userName).setValue(result);
+                                        Intent intent= new Intent(getBaseContext(),Main2Activity.class);
+                                        startActivity(intent);
 
 
                                     } else {
                                         Toast.makeText(MainActivity.this, "Password incorrect", Toast.LENGTH_SHORT).show();
+
                                     }
 
 
