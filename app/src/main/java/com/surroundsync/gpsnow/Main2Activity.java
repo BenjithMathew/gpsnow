@@ -26,6 +26,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -36,10 +37,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Main2Activity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, LocationListener{
+        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, LocationListener {
 
     private GoogleMap mMap;
     protected GoogleApiClient mGoogleApiClient;
@@ -51,7 +53,18 @@ public class Main2Activity extends AppCompatActivity
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
     private String userName;
+    ArrayList arrayList;
 
+    public DatabaseReference userChildRef;
+
+    String name = null;
+    String latitude = null;
+    String longitude = null;
+    boolean status = false;
+
+    GoogleMap map;
+
+    Marker myMarker;
 
 
     @Override
@@ -59,6 +72,7 @@ public class Main2Activity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
 
+        mDatabase = FirebaseDatabase.getInstance().getReference();
         userName = getIntent().getStringExtra("username");
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -76,7 +90,6 @@ public class Main2Activity extends AppCompatActivity
         }
         locationManager.requestLocationUpdates(bestProvider, 20000, 0, this);
 
-        mDatabase = FirebaseDatabase.getInstance().getReference();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -86,7 +99,6 @@ public class Main2Activity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
 
 
     }
@@ -134,7 +146,7 @@ public class Main2Activity extends AppCompatActivity
             SharedPreferences.Editor editor = sharedpreferences.edit();
             editor.clear();
             editor.commit();
-            final DatabaseReference userChildRef = mDatabase.child("gpsnow");
+            userChildRef = mDatabase.child("gpsnow");
 
             userChildRef.child("login").child(userName).addListenerForSingleValueEvent(
                     new ValueEventListener() {
@@ -181,14 +193,16 @@ public class Main2Activity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
-
-        googleMap.addMarker(new MarkerOptions()
-                .position(new LatLng(0, 0))
-                .title("Marker"));
+        fetchingDataFromFirebase();
+        //     googleMap.addMarker(new MarkerOptions()
+        //           .position(new LatLng(0, 0))
+        //           .title("Marker"));
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        googleMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+//        LatLng sydney = new LatLng(-34, 151);
+
+
+        //googleMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        //googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
         Log.d("onMapReady", "method intrupted");
 
@@ -197,6 +211,48 @@ public class Main2Activity extends AppCompatActivity
         googleMap.getUiSettings().setMyLocationButtonEnabled(true);
         googleMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
         Log.d("onMapReady", "method completed");
+
+
+    }
+
+    private void fetchingDataFromFirebase() {
+
+        userChildRef = mDatabase.child("gpsnow");
+        userChildRef.child("login").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+
+
+                    Log.d("data", " value : " + dataSnapshot.getValue());
+                    name = snapshot.child("name").getValue().toString();
+                    longitude = snapshot.child("longitude").getValue().toString();
+                    latitude = snapshot.child("latitude").getValue().toString();
+                    status = (boolean) snapshot.child("status").getValue();
+
+                    double x = Double.parseDouble(latitude);
+                    double y = Double.parseDouble(longitude);
+
+                    createMarker(x, y, name, status);
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void createMarker(double x, double y, String name, boolean Status) {
+        if (status == true)
+            mMap.addMarker(new MarkerOptions().position(new LatLng(x, y)).anchor(0.5f, 0.5f).title(name).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+        else
+            mMap.addMarker(new MarkerOptions().position(new LatLng(x, y)).anchor(0.5f, 0.5f).title(name).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+
+        return;
 
     }
 
@@ -207,8 +263,11 @@ public class Main2Activity extends AppCompatActivity
         double latitude = location.getLatitude();
         double longitude = location.getLongitude();
         LatLng latLng = new LatLng(latitude, longitude);
-        mMap.clear();
-        mMap.addMarker(new MarkerOptions().position(latLng));
+        //mMap.clear();
+        if (myMarker != null) {
+            myMarker.remove();
+        }
+        myMarker = mMap.addMarker(new MarkerOptions().position(latLng).title("Ashray"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
         locationTv.setText("Latitude:" + latitude + ", Longitude:" + longitude);
@@ -240,6 +299,7 @@ public class Main2Activity extends AppCompatActivity
             return false;
         }
     }
+
 
 }
 

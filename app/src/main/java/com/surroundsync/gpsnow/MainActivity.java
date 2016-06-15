@@ -3,6 +3,7 @@ package com.surroundsync.gpsnow;
 import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -20,9 +21,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
+import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LocationListener {
 
     private static final String TAG = "EmailPassword";
     private LocationManager locationManager;
@@ -65,16 +67,43 @@ public class MainActivity extends AppCompatActivity {
             }
         });*/
 
-        locationManager= (LocationManager) getSystemService(LOCATION_SERVICE);
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
         criteria=new Criteria();
         provider=locationManager.getBestProvider(criteria,false);
         location=locationManager.getLastKnownLocation(provider);
-        double lattitude=location.getLatitude();
-        double longitude=location.getLongitude();
-        stringLatitude=String.valueOf(lattitude);
-        stringLongitude=String.valueOf(longitude);
+        Log.d("locationlog", "location :" + location);
+        if (location != null) {
+            location = locationManager.getLastKnownLocation(provider);
+            onLocationChanged(location);
+        } else {
+            List<String> providers = locationManager.getProviders(true);
+            Location bestLocation = null;
+            for (String provider : providers) {
+
+                Location l = locationManager.getLastKnownLocation(provider);
+                if (l == null) {
+                    continue;
+                }
+                if (bestLocation == null
+                        || l.getAccuracy() < bestLocation.getAccuracy()) {
+                    bestLocation = l;
+                }
+            }
+            if (bestLocation == null) {
+                bestLocation = null;
+                Toast.makeText(this, "Location not available", Toast.LENGTH_SHORT).show();
+            }
+            location = bestLocation;
+            Log.d("locationlog", "location :" + location);
+            double latitude = location.getLatitude();
+            stringLatitude = String.valueOf(latitude);
+            double longitude = location.getLongitude();
+            stringLongitude = String.valueOf(longitude);
+        }
+
+
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
 
@@ -110,7 +139,10 @@ public class MainActivity extends AppCompatActivity {
                                         userChildRef.child("login").child(userName).setValue(result);
                                         Intent intent= new Intent(getBaseContext(),Main2Activity.class);
                                         intent.putExtra("username",userName);
+                                        Log.d("Start Map Activity","intent to start");
                                         startActivity(intent);
+                                        Log.d("Start Map Activity","intent started");
+
 
 
                                     } else {
@@ -189,4 +221,26 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void onLocationChanged(Location location) {
+        double latitude = location.getLatitude();
+        stringLatitude = String.valueOf(latitude);
+        double longitude = location.getLongitude();
+        stringLongitude = String.valueOf(longitude);
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
 }
