@@ -3,7 +3,9 @@ package com.surroundsync.gpsnow;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Address;
 import android.location.Criteria;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -17,7 +19,10 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -37,8 +42,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, LocationListener {
@@ -48,12 +56,21 @@ public class Main2Activity extends AppCompatActivity
     Location mLastLocation;
     Marker marker;
     double lat = 0, lng = 0;
-
+    private Geocoder geocoder;
+    private List<Address> address;
+    private double lati;
+    private double longi;
+    String myAddress;
+    String city;
+    String state;
+    String country;
+    String knownArea;
+    String subLocation;
+    Location location;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
     private String userName;
-    ArrayList arrayList;
 
     public DatabaseReference userChildRef;
 
@@ -66,14 +83,21 @@ public class Main2Activity extends AppCompatActivity
 
     Marker myMarker;
 
+    NavigationView navigationView;
+    ListView listview;
+
+    /*ArrayAdapter adapter;*/
+
+    List<UserDetails> userDetailsList = new ArrayList<>();
+    /*List<String> registeredUsers = new ArrayList<>();*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
-
         mDatabase = FirebaseDatabase.getInstance().getReference();
         userName = getIntent().getStringExtra("username");
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -84,11 +108,46 @@ public class Main2Activity extends AppCompatActivity
         LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         Criteria criteria = new Criteria();
         String bestProvider = locationManager.getBestProvider(criteria, true);
-        Location location = locationManager.getLastKnownLocation(bestProvider);
+        location = locationManager.getLastKnownLocation(bestProvider);
         if (location != null) {
             onLocationChanged(location);
+        } else {
+            List<String> providers = locationManager.getProviders(true);
+            Location bestLocation = null;
+            for (String provider : providers) {
+
+                Location l = locationManager.getLastKnownLocation(provider);
+                if (l == null) {
+                    continue;
+                }
+                if (bestLocation == null
+                        || l.getAccuracy() < bestLocation.getAccuracy()) {
+                    bestLocation = l;
+                }
+            }
+            if (bestLocation == null) {
+                bestLocation = null;
+                Toast.makeText(this, "Location not available", Toast.LENGTH_SHORT).show();
+            }
+            location = bestLocation;
+
         }
         locationManager.requestLocationUpdates(bestProvider, 20000, 0, this);
+        geocoder = new Geocoder(this, Locale.getDefault());
+        try {
+            address = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+
+            myAddress = address.get(0).getAddressLine(0);
+            city = address.get(0).getLocality();
+            state = address.get(0).getAdminArea();
+            country = address.get(0).getCountryName();
+            knownArea = address.get(0).getFeatureName();
+            subLocation = address.get(0).getSubLocality();
+            setTitle(subLocation);
+            // tvTittle.setText(city);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -97,9 +156,47 @@ public class Main2Activity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+
+
+        /*Menu m =navigationView.getMenu();
+        SubMenu users = m.addSubMenu("Users");
+        users.add("me");*/
         navigationView.setNavigationItemSelectedListener(this);
 
+        /*listview= (ListView)findViewById(R.id.activity_list_nav_main2);*/
+
+        /*adapter = new ArrayAdapter(getBaseContext(),android.R.layout.simple_list_item_1,registeredUsers);
+
+        listview.setAdapter(adapter);*/
+
+
+    }
+
+    private void addItemsToDrawer(List<UserDetails> list) {
+
+        Menu m = navigationView.getMenu();
+        SubMenu users = m.addSubMenu("Users");
+
+        for (final UserDetails details : list) {
+            users.add(details.getName()).setTitle(details.getName()).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+
+                    Toast.makeText(Main2Activity.this, " title : "+item.getTitle(), Toast.LENGTH_SHORT).show();
+
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(Double.parseDouble(details.getLatitude()),Double.parseDouble(details.getLongitude())),20.0f));
+
+                    return false;
+                }
+            });
+
+        }
+
+        /*m.add(name);*/
+
+        /*MenuItem mi = m.getItem(m.size()-1);
+        mi.setTitle(mi.getTitle());*/
 
     }
 
@@ -173,15 +270,6 @@ public class Main2Activity extends AppCompatActivity
                         }
                     });
 
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
 
         }
 
@@ -209,7 +297,7 @@ public class Main2Activity extends AppCompatActivity
         googleMap.setMyLocationEnabled(true);
         googleMap.getUiSettings().setZoomControlsEnabled(true);
         googleMap.getUiSettings().setMyLocationButtonEnabled(true);
-        googleMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+        googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         Log.d("onMapReady", "method completed");
 
 
@@ -234,8 +322,15 @@ public class Main2Activity extends AppCompatActivity
                     double x = Double.parseDouble(latitude);
                     double y = Double.parseDouble(longitude);
 
+                    UserDetails object = new UserDetails(name, latitude, longitude, status);
+                    userDetailsList.add(object);
                     createMarker(x, y, name, status);
                 }
+
+                addItemsToDrawer(userDetailsList);
+
+
+
 
             }
 
@@ -299,7 +394,6 @@ public class Main2Activity extends AppCompatActivity
             return false;
         }
     }
-
 
 }
 
