@@ -43,7 +43,7 @@ public class NewUserRegistration extends Activity implements View.OnClickListene
     private String password;
     private Pattern pattern;
     private Matcher matcher;
-    private static final String PASSWORD_PATTERN = "((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%]).{5,15})";
+    private static final String PASSWORD_PATTERN = "((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%*_!&%/+-]).{5,15})";
     private DatabaseReference rootReference = FirebaseDatabase.getInstance().getReference();
     private DatabaseReference ref = rootReference.child("gpsnow");
     ProgressBar pbPassword;
@@ -93,11 +93,11 @@ public class NewUserRegistration extends Activity implements View.OnClickListene
             } else if (!matcher.matches()) {
 
                 if (passwordString.length() > 15) {
-                    etPassword.setError("Password have 5-15 characters,and it contains at least one [a-z] ,at least one [A-Z] ,at least one [0-9] and contains one special symbols @,#,$,%");
+                    etPassword.setError("Password have 5-15 characters,and it contains at least one [a-z] ,at least one [A-Z] ,at least one [0-9] and contains one special symbols @,#,$,%,*,_,!,&,%,/,+,-");
                     tvPasswordChecker.setTextColor(Color.RED);
                     tvPasswordChecker.setText("Maximum");
                 } else {
-                    etPassword.setError("Password have 5-15 characters,and it contains at least one [a-z] ,at least one [A-Z] ,at least one [0-9] and contains one special symbols @,#,$,%");
+                    etPassword.setError("Password have 5-15 characters,and it contains at least one [a-z] ,at least one [A-Z] ,at least one [0-9] and contains one special symbols @,#,$,%,*,_,!,&,%,/,+,-");
                     pbPassword.setVisibility(View.VISIBLE);
                     pbPassword.getProgressDrawable().setColorFilter(
                             Color.parseColor("#ff0000"), android.graphics.PorterDuff.Mode.SRC_IN);
@@ -194,7 +194,7 @@ public class NewUserRegistration extends Activity implements View.OnClickListene
             etPassword.setError("Enter a password");
             flag = false;
         } else if (!matcher.matches()) {
-            etPassword.setError("Password have 5-15 characters,and it contains at least one [a-z] ,at least one [A-Z] ,at least one [0-9] and contains one special symbols @,#,$,%");
+            etPassword.setError("Password have 5-15 characters,and it contains at least one [a-z] ,at least one [A-Z] ,at least one [0-9] and contains one special symbols @,#,$,%,*,_,!,&,%,/,+,-");
             etPassword.setText("");
             flag = false;
 
