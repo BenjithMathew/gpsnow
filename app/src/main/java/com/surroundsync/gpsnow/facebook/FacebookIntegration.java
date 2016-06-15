@@ -11,6 +11,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -35,6 +36,7 @@ import com.surroundsync.gpsnow.R;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static android.widget.Toast.LENGTH_SHORT;
@@ -55,22 +57,21 @@ public class FacebookIntegration extends AppCompatActivity implements LocationLi
     private String currentLongitude = null;
     private double latitude = 0.0;
     private double longitude = 0.0;
-    private Boolean isGPSEnabled = false;
-    private Boolean isNetworkEnabled = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
         AppEventsLogger.activateApp(this);
+        setContentView(R.layout.activity_facebook_integration);
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
         criteria = new Criteria();
         provider = locationManager.getBestProvider(criteria, false);
-
-        if (ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -81,49 +82,75 @@ public class FacebookIntegration extends AppCompatActivity implements LocationLi
             return;
         }
         location = locationManager.getLastKnownLocation(provider);
+        Log.d("locationlog", "location :" + location);
+        if (location != null) {
+            location = locationManager.getLastKnownLocation(provider);
+            onLocationChanged(location);
+        } else {
+            List<String> providers = locationManager.getProviders(true);
+            Location bestLocation = null;
+            for (String provider : providers) {
 
-        setContentView(R.layout.activity_facebook_integration);
+                Location l = locationManager.getLastKnownLocation(provider);
+                if (l == null) {
+                    continue;
+                }
+                if (bestLocation == null
+                        || l.getAccuracy() < bestLocation.getAccuracy()) {
+                    bestLocation = l;
+                }
+            }
+            if (bestLocation == null) {
+                bestLocation = null;
+                Toast.makeText(this, "Location not available", LENGTH_SHORT).show();
+            }
+            location = bestLocation;
+            Log.d("locationlog", "location :" + location);
+            location();
+        }
+
         callbackManager = CallbackManager.Factory.create();
         Firebase.setAndroidContext(this);
         fbLoginButton = (LoginButton) findViewById(R.id.activity_facebook_login_button);
         fbLoginButton.setReadPermissions("email");
-
-
         fbLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(final LoginResult loginResult) {
-
+                location();
                 Bundle params = new Bundle();
                 params.putString("fields", "id,email,name,picture");
-
 
                 GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
                     @Override
                     public void onCompleted(JSONObject jsonObject, GraphResponse graphResponse) {
                         try {
 
-                            location();
                             userId = loginResult.getAccessToken().getUserId();
                             userName = jsonObject.getString("name").toString();
                             Query query = ref.child("login").child(userId);
                             query.addListenerForSingleValueEvent(new ValueEventListener() {
+
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
+                                    Log.d("login", "on data change");
                                     if (dataSnapshot.getValue() == null) {
                                         Map<String, Object> map = new HashMap<>();
                                         map.put("name", userName);
-                                        map.put("userId", userId);
+                                        map.put("username", userId);
                                         map.put("source", "fb");
                                         map.put("status", true);
                                         map.put("latitude", currentLatitude);
                                         map.put("longitude", currentLongitude);
                                         ref.child("login").child(userId).setValue(map);
+                                        Toast.makeText(getBaseContext(), "You are online", LENGTH_SHORT).show();
                                     } else {
                                         Map<String, Object> map = new HashMap<>();
                                         map.put("latitude", currentLatitude);
                                         map.put("longitude", currentLongitude);
                                         map.put("status", true);
+                                        map.put("username", userId);
                                         ref.child("login").child(userId).updateChildren(map);
+                                        Toast.makeText(getBaseContext(), "You are online", LENGTH_SHORT).show();
                                     }
                                 }
 
@@ -146,6 +173,7 @@ public class FacebookIntegration extends AppCompatActivity implements LocationLi
                                                 map.put("longitude", currentLongitude);
                                                 map.put("status", false);
                                                 ref.child("login").child(userId).updateChildren(map);
+                                                Toast.makeText(getBaseContext(), "You are offline", LENGTH_SHORT).show();
                                             }
 
                                             @Override
@@ -166,6 +194,7 @@ public class FacebookIntegration extends AppCompatActivity implements LocationLi
                 request.setParameters(params);
                 request.executeAsync();
                 Toast.makeText(getBaseContext(), "Login Successful", LENGTH_SHORT).show();
+
             }
 
 
@@ -176,30 +205,24 @@ public class FacebookIntegration extends AppCompatActivity implements LocationLi
 
             @Override
             public void onError(FacebookException exception) {
-                Toast.makeText(getBaseContext(), "Error...!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(), "Error..! Internet is not Available", Toast.LENGTH_SHORT).show();
             }
-
 
         });
 
-
     }
+
 
     //To get the location details
     public void location() {
-        if (!isNetworkEnabled) {
-            Toast.makeText(getBaseContext(), "Network is not available", Toast.LENGTH_SHORT).show();
-        } else if (!isGPSEnabled) {
-            Toast.makeText(getBaseContext(), "Location is not available..! Turn ON your Location", Toast.LENGTH_SHORT).show();
-        } else {
 
+        if (location != null) {
             latitude = location.getLatitude();
             currentLatitude = String.valueOf(latitude);
             longitude = location.getLongitude();
             currentLongitude = String.valueOf(longitude);
 
         }
-
     }
 
     @Override
@@ -209,26 +232,30 @@ public class FacebookIntegration extends AppCompatActivity implements LocationLi
 
     }
 
+
     @Override
     public void onLocationChanged(Location location) {
         latitude = location.getLatitude();
         currentLatitude = String.valueOf(latitude);
         longitude = location.getLongitude();
         currentLongitude = String.valueOf(longitude);
+
+
     }
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-
+        Log.d("Latitude:", " " + status + " provider: " + provider);
     }
 
     @Override
     public void onProviderEnabled(String provider) {
-
+        Log.d("Latitude", "enable");
     }
 
     @Override
     public void onProviderDisabled(String provider) {
 
+        Log.d("Latitude", "disable");
     }
 }
