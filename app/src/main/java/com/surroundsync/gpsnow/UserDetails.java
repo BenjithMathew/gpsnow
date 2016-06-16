@@ -9,15 +9,18 @@ public class UserDetails {
     String latitude;
     String longitude;
     boolean status;
+    String userId;
 
     UserDetails(){
 
     }
-    public UserDetails(String name, String latitude, String longitude, boolean status) {
+
+    public UserDetails(String name, String latitude, String longitude, boolean status, String userId) {
         this.name = name;
         this.latitude = latitude;
         this.longitude = longitude;
         this.status = status;
+        this.userId = userId;
     }
 
     public String getName() {
@@ -50,5 +53,13 @@ public class UserDetails {
 
     public void setStatus(boolean status) {
         this.status = status;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

@@ -40,6 +40,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
@@ -47,6 +48,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, LocationListener {
@@ -72,24 +74,29 @@ public class Main2Activity extends AppCompatActivity
     private DatabaseReference mDatabase;
     private String userName;
 
-    public DatabaseReference userChildRef;
+    public static DatabaseReference userChildRef;
 
     String name = null;
     String latitude = null;
     String longitude = null;
     boolean status = false;
-
+    String usersId;
+    double x, y = 0.0;
     GoogleMap map;
-
+    ArrayList<String> blockList;
     Marker myMarker;
 
     NavigationView navigationView;
     ListView listview;
 
+    List<String> list;
+    List<String> listBlock;
     /*ArrayAdapter adapter;*/
 
+    String registerduserID;
+
     List<UserDetails> userDetailsList = new ArrayList<>();
-    /*List<String> registeredUsers = new ArrayList<>();*/
+    ArrayList<String> registeredUsers = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -179,14 +186,21 @@ public class Main2Activity extends AppCompatActivity
         SubMenu users = m.addSubMenu("Users");
 
         for (final UserDetails details : list) {
+
+            registerduserID = details.getUserId();
+
+            registeredUsers.add(registerduserID);
+
             users.add(details.getName()).setTitle(details.getName()).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
 
-                    Toast.makeText(Main2Activity.this, " title : "+item.getTitle(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Main2Activity.this, " title : " + item.getTitle(), Toast.LENGTH_SHORT).show();
 
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(Double.parseDouble(details.getLatitude()),Double.parseDouble(details.getLongitude())),20.0f));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(Double.parseDouble(details.getLatitude()), Double.parseDouble(details.getLongitude())), 20.0f));
 
+
+                    dontShowMapLocation(details.getUserId());
                     return false;
                 }
             });
@@ -198,6 +212,39 @@ public class Main2Activity extends AppCompatActivity
         /*MenuItem mi = m.getItem(m.size()-1);
         mi.setTitle(mi.getTitle());*/
 
+    }
+
+    private void dontShowMapLocation(final String userId) {
+
+        if(list.contains(userId)){
+
+            userChildRef = mDatabase.child("gpsnow").child("login");
+            userChildRef.child(userId).child("blocked").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    GenericTypeIndicator<List<String>> typeIndicator = new GenericTypeIndicator<List<String>>() {
+                    };
+                    listBlock = dataSnapshot.getValue(typeIndicator);
+
+                    if(listBlock.contains(userName)){
+                        Map<String, Object> map = new HashMap<>();
+                        listBlock.remove(userName);
+
+                        map.put("blocked", listBlock);
+                        userChildRef.child(userId).updateChildren(map);
+
+                    }
+
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+        }
     }
 
     @Override
@@ -280,19 +327,8 @@ public class Main2Activity extends AppCompatActivity
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-
+        loginUser();
         fetchingDataFromFirebase();
-        //     googleMap.addMarker(new MarkerOptions()
-        //           .position(new LatLng(0, 0))
-        //           .title("Marker"));
-        // Add a marker in Sydney and move the camera
-//        LatLng sydney = new LatLng(-34, 151);
-
-
-        //googleMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        //googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-
-        Log.d("onMapReady", "method intrupted");
 
         googleMap.setMyLocationEnabled(true);
         googleMap.getUiSettings().setZoomControlsEnabled(true);
@@ -303,6 +339,70 @@ public class Main2Activity extends AppCompatActivity
 
     }
 
+
+    public void loginUser() {
+
+        userChildRef = mDatabase.child("gpsnow").child("login");
+        userChildRef.child(userName).child("blocked").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                Log.d("value", "value : "+dataSnapshot.getValue());
+
+                GenericTypeIndicator<List<String>> typeIndicator = new GenericTypeIndicator<List<String>>() {
+                };
+                 list = dataSnapshot.getValue(typeIndicator);
+                    /*String a = listOfBlockedUsers.getValue().toString();*/
+
+                /*blockList.add(String.valueOf(listOfBlockedUsers.getKey()));*/
+
+                Log.d("login blocklist list", "" + list.toString());
+                showMap(list);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+
+    private void showMap(final List<String> blockL) {
+        Log.d("showmap", "showmapstarts");
+        userChildRef = mDatabase.child("gpsnow");
+        userChildRef.child("login").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Log.d("data", " value : " + dataSnapshot.getValue());
+                    name = snapshot.child("name").getValue().toString();
+                    longitude = snapshot.child("longitude").getValue().toString();
+                    latitude = snapshot.child("latitude").getValue().toString();
+                    status = (boolean) snapshot.child("status").getValue();
+                    usersId = snapshot.child("username").getValue().toString();
+
+                    x = Double.parseDouble(latitude);
+                    y = Double.parseDouble(longitude);
+                    UserDetails object = new UserDetails(name, latitude, longitude, status, usersId);
+                    userDetailsList.add(object);
+                    createMarker(x, y, name, usersId, status, blockL);
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        Log.d("showmap", "showmapend");
+
+    }
+
+
     private void fetchingDataFromFirebase() {
 
         userChildRef = mDatabase.child("gpsnow");
@@ -311,25 +411,27 @@ public class Main2Activity extends AppCompatActivity
             public void onDataChange(DataSnapshot dataSnapshot) {
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-
-
                     Log.d("data", " value : " + dataSnapshot.getValue());
                     name = snapshot.child("name").getValue().toString();
                     longitude = snapshot.child("longitude").getValue().toString();
                     latitude = snapshot.child("latitude").getValue().toString();
                     status = (boolean) snapshot.child("status").getValue();
+                    usersId = snapshot.child("username").getValue().toString();
+                    String a = snapshot.child("blocked").getValue().toString();
 
-                    double x = Double.parseDouble(latitude);
-                    double y = Double.parseDouble(longitude);
+                    //blockList.add(a);
 
-                    UserDetails object = new UserDetails(name, latitude, longitude, status);
+                    x = Double.parseDouble(latitude);
+                    y = Double.parseDouble(longitude);
+                    UserDetails object = new UserDetails(name, latitude, longitude, status, usersId);
                     userDetailsList.add(object);
-                    createMarker(x, y, name, status);
+
+                    //  createMarker(x,y,name,usersId,status,registeredUsers);
+
+
                 }
 
                 addItemsToDrawer(userDetailsList);
-
-
 
 
             }
@@ -341,12 +443,18 @@ public class Main2Activity extends AppCompatActivity
         });
     }
 
-    private void createMarker(double x, double y, String name, boolean Status) {
-        if (status == true)
-            mMap.addMarker(new MarkerOptions().position(new LatLng(x, y)).anchor(0.5f, 0.5f).title(name).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-        else
-            mMap.addMarker(new MarkerOptions().position(new LatLng(x, y)).anchor(0.5f, 0.5f).title(name).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+    private void createMarker(double x, double y, String name, String usersID, boolean Status, List<String> listBlock) {
+        Log.d("craetemarker", "create marker_starts");
+        for (String listofBlockedUsers : listBlock) {
 
+            if (listofBlockedUsers.equals(usersID)) {
+
+                mMap.addMarker(new MarkerOptions().position(new LatLng(x, y)).anchor(0.5f, 0.5f).title(name).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+
+
+            }
+        }
+        Log.d("craetemarker", "create marker_end");
         return;
 
     }
@@ -362,7 +470,7 @@ public class Main2Activity extends AppCompatActivity
         if (myMarker != null) {
             myMarker.remove();
         }
-        myMarker = mMap.addMarker(new MarkerOptions().position(latLng).title("Ashray"));
+        myMarker = mMap.addMarker(new MarkerOptions().position(latLng).title("Current Location"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
         locationTv.setText("Latitude:" + latitude + ", Longitude:" + longitude);

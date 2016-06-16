@@ -20,9 +20,11 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -58,6 +60,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     String country;
     String knownArea;
     String subLocation;
+    DatabaseReference userChildRef;
+
+    ArrayList<String> blockUser ;
+
+    Main2Activity main2Activityobj;
+
+    String firebaseUserName;
 
     private FirebaseAuth.AuthStateListener mAuthListener;
 
@@ -71,6 +80,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         btnLogin = (Button) findViewById(R.id.activity_btn_login_ma);
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
+
+        blockUser = new ArrayList<String>();
+
+
 
         /*btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -142,8 +155,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 final String password = etPassword.getText().toString();
 
 
-                final DatabaseReference userChildRef = mDatabase.child("gpsnow");
+                userChildRef = mDatabase.child("gpsnow");
 
+                fetchingDataFromFirebase();
                 userChildRef.child("users").child(userName).addListenerForSingleValueEvent(
                         new ValueEventListener() {
                             @Override
@@ -151,27 +165,53 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
                                 if (dataSnapshot.getValue() != null) {
                                     // Get user value
-
                                     userNameFromServer = (String) dataSnapshot.child("username").getValue();
                                     passwordFromServer = (String) dataSnapshot.child("password").getValue();
                                     nameFromServer = (String) dataSnapshot.child("name").getValue();
                                     if (passwordFromServer.equals(password)) {
-                                        loginStatus = true;
-                                        Toast.makeText(MainActivity.this, "validation success.", Toast.LENGTH_SHORT).show();
-                                        HashMap<String, Object> result = new HashMap<>();
-                                        result.put("username", userName);
-                                        result.put("latitude",stringLatitude);
-                                        result.put("longitude",stringLongitude);
-                                        result.put("name",nameFromServer);
-                                        result.put("status",loginStatus);
-                                        userChildRef.child("login").child(userName).setValue(result);
-                                        Intent intent= new Intent(getBaseContext(),Main2Activity.class);
-                                        intent.putExtra("username",userName);
-                                        Log.d("Start Map Activity","intent to start");
-                                        startActivity(intent);
-                                        Log.d("Start Map Activity","intent started");
 
+                                        Query query = userChildRef.child("login").child(userName);
+                                        query.addListenerForSingleValueEvent(new ValueEventListener() {
+                                          @Override
+                                          public void onDataChange(DataSnapshot dataSnapshot) {
 
+                                              if(dataSnapshot.getValue()==null){
+
+                                                  loginStatus = true;
+                                                  Toast.makeText(MainActivity.this, "validation success.", Toast.LENGTH_SHORT).show();
+                                                  HashMap<String, Object> result = new HashMap<>();
+                                                  result.put("username", userName);
+                                                  result.put("latitude",stringLatitude);
+                                                  result.put("longitude",stringLongitude);
+                                                  result.put("name",nameFromServer);
+                                                  result.put("status",loginStatus);
+                                                  result.put("blocked",blockUser);
+                                                  Log.d("blocked users"," all firebase userID"+blockUser);
+                                                  userChildRef.child("login").child(userName).setValue(result);
+                                                  Intent intent= new Intent(getBaseContext(),Main2Activity.class);
+                                                  intent.putExtra("username",userName);
+                                                  Log.d("Start Map Activity","intent to start");
+                                                  startActivity(intent);
+                                                  Log.d("Start Map Activity","intent started");
+                                              }
+                                              else {
+                                                  loginStatus = true;
+                                                  Toast.makeText(MainActivity.this, "validation success.", Toast.LENGTH_SHORT).show();
+                                                  HashMap<String, Object> result = new HashMap<>();
+                                                  result.put("latitude",stringLatitude);
+                                                  result.put("longitude",stringLongitude);
+                                                  result.put("status",loginStatus);
+                                                  userChildRef.child("login").child(userName).updateChildren(result);
+                                                  Intent intent= new Intent(getBaseContext(),Main2Activity.class);
+                                                  intent.putExtra("username",userName);
+                                                  startActivity(intent);
+
+                                              }
+                                          }
+                                          @Override
+                                          public void onCancelled(DatabaseError databaseError) {
+                                         }
+                                        });
 
                                     } else {
                                         Toast.makeText(MainActivity.this, "Password incorrect", Toast.LENGTH_SHORT).show();
@@ -270,5 +310,40 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     @Override
     public void onProviderDisabled(String provider) {
 
+    }
+    private void fetchingDataFromFirebase() {
+
+        userChildRef = mDatabase.child("gpsnow");
+        userChildRef.child("login").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+
+
+                    Log.d("data", " value : " + dataSnapshot.getValue());
+                    String name = snapshot.child("name").getValue().toString();
+                    String longitude = snapshot.child("longitude").getValue().toString();
+                    String latitude = snapshot.child("latitude").getValue().toString();
+                    boolean status = (boolean) snapshot.child("status").getValue();
+                    String userId = snapshot.child("username").getValue().toString();
+
+                    double x = Double.parseDouble(latitude);
+                    double y = Double.parseDouble(longitude);
+
+                    UserDetails object = new UserDetails(name, latitude, longitude, status,userId);
+                    blockUser.add(userId);
+
+                }
+                Log.d("block user"," blockuser: "+blockUser.toString());
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+
+        });
     }
 }
