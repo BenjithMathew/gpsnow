@@ -29,12 +29,14 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.surroundsync.gpsnow.R;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +59,9 @@ public class FacebookIntegration extends AppCompatActivity implements LocationLi
     private String currentLongitude = null;
     private double latitude = 0.0;
     private double longitude = 0.0;
+    private ArrayList<String> loginUserList;
+    private String allUsersId;
+    private List<String> allUsersBlockedlist;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +69,7 @@ public class FacebookIntegration extends AppCompatActivity implements LocationLi
         FacebookSdk.sdkInitialize(getApplicationContext());
         AppEventsLogger.activateApp(this);
         setContentView(R.layout.activity_facebook_integration);
+        loginUserList = new ArrayList<String>();
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -117,14 +123,15 @@ public class FacebookIntegration extends AppCompatActivity implements LocationLi
             @Override
             public void onSuccess(final LoginResult loginResult) {
                 location();
+                fetchingAllLoginUserIdList();
                 Bundle params = new Bundle();
                 params.putString("fields", "id,email,name,picture");
 
+//<-----Facebook login button method
                 GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
                     @Override
                     public void onCompleted(JSONObject jsonObject, GraphResponse graphResponse) {
                         try {
-
                             userId = loginResult.getAccessToken().getUserId();
                             userName = jsonObject.getString("name").toString();
                             Query query = ref.child("login").child(userId);
@@ -134,7 +141,9 @@ public class FacebookIntegration extends AppCompatActivity implements LocationLi
                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                     Log.d("login", "on data change");
                                     if (dataSnapshot.getValue() == null) {
+                                        addNewUserToBlock(userId.toString());
                                         Map<String, Object> map = new HashMap<>();
+                                        map.put("blocked", loginUserList);
                                         map.put("name", userName);
                                         map.put("username", userId);
                                         map.put("source", "fb");
@@ -143,23 +152,38 @@ public class FacebookIntegration extends AppCompatActivity implements LocationLi
                                         map.put("longitude", currentLongitude);
                                         ref.child("login").child(userId).setValue(map);
                                         Toast.makeText(getBaseContext(), "You are online", LENGTH_SHORT).show();
+
+                                        /*Intent intent = new Intent(getBaseContext(), Main2Activity.class);
+                                        intent.putExtra("username", userName);
+                                        Log.d("Start Map Activity", "intent to start");
+                                        startActivity(intent);
+                                        Log.d("Start Map Activity", "intent started");*/
+
+
                                     } else {
                                         Map<String, Object> map = new HashMap<>();
                                         map.put("latitude", currentLatitude);
                                         map.put("longitude", currentLongitude);
                                         map.put("status", true);
-                                        map.put("username", userId);
                                         ref.child("login").child(userId).updateChildren(map);
                                         Toast.makeText(getBaseContext(), "You are online", LENGTH_SHORT).show();
+
+
+                                          /*Intent intent = new Intent(getBaseContext(), Main2Activity.class);
+                                        intent.putExtra("username", userName);
+                                        Log.d("Start Map Activity", "intent to start");
+                                        startActivity(intent);
+                                        Log.d("Start Map Activity", "intent started");*/
+
                                     }
                                 }
 
-
                                 @Override
                                 public void onCancelled(DatabaseError databaseError) {
-
                                 }
                             });
+
+                //---->Facebook Logout button
                             fbLoginButton.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
@@ -213,9 +237,67 @@ public class FacebookIntegration extends AppCompatActivity implements LocationLi
     }
 
 
-    //To get the location details
-    public void location() {
+//<---Retrieving all login users data from the firebase
+private void fetchingAllLoginUserIdList() {
+        ref.child("login").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
 
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String userId = snapshot.child("username").getValue().toString();
+                    loginUserList.add(userId);
+                }
+                Log.d("block user", " blockuser: " + loginUserList.toString());
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+
+//--->Updating already login users blocked list with new user.
+public void addNewUserToBlock(final String userName) {
+        ref.child("login").addValueEventListener(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    if (!snapshot.getKey().toString().equals(userName)) {
+                        Log.d("snapshot", "" + snapshot);
+                        allUsersId = snapshot.child("username").getValue().toString();
+                        Log.d("alluserid", "" + allUsersId);
+                        GenericTypeIndicator<List<String>> typeIndicator = new GenericTypeIndicator<List<String>>() {   };
+                        allUsersBlockedlist = snapshot.child("blocked").getValue(typeIndicator);
+                        Log.d("blocklist", "list" + allUsersBlockedlist);
+
+                        if(!allUsersBlockedlist.contains(userName)) {
+                            Log.d("insideblocklist",""+allUsersBlockedlist);
+                            Map<String, Object> map = new HashMap<>();
+                            allUsersBlockedlist.add(userName);
+                            map.put("blocked", allUsersBlockedlist);
+                            ref.child("login").child(allUsersId).updateChildren(map);
+                        }
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+
+        });
+    }
+
+
+//<---To get the location details
+    public void location() {
         if (location != null) {
             latitude = location.getLatitude();
             currentLatitude = String.valueOf(latitude);
@@ -225,6 +307,8 @@ public class FacebookIntegration extends AppCompatActivity implements LocationLi
         }
     }
 
+
+//<---facebook activity on result method
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -232,15 +316,13 @@ public class FacebookIntegration extends AppCompatActivity implements LocationLi
 
     }
 
-
+//<----Location change
     @Override
     public void onLocationChanged(Location location) {
         latitude = location.getLatitude();
         currentLatitude = String.valueOf(latitude);
         longitude = location.getLongitude();
         currentLongitude = String.valueOf(longitude);
-
-
     }
 
     @Override
@@ -255,7 +337,6 @@ public class FacebookIntegration extends AppCompatActivity implements LocationLi
 
     @Override
     public void onProviderDisabled(String provider) {
-
         Log.d("Latitude", "disable");
     }
 }
