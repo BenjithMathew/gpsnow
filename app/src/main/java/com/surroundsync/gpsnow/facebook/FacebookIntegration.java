@@ -50,7 +50,7 @@ public class FacebookIntegration extends AppCompatActivity implements LocationLi
     private DatabaseReference rootReference = FirebaseDatabase.getInstance().getReference();
     private DatabaseReference ref = rootReference.child("gpsnow");
     private String userId;
-    private String userName;
+    private String name;
     private LocationManager locationManager;
     private Location location;
     private Criteria criteria;
@@ -133,7 +133,7 @@ public class FacebookIntegration extends AppCompatActivity implements LocationLi
                     public void onCompleted(JSONObject jsonObject, GraphResponse graphResponse) {
                         try {
                             userId = loginResult.getAccessToken().getUserId();
-                            userName = jsonObject.getString("name").toString();
+                            name = jsonObject.getString("name").toString();
                             Query query = ref.child("login").child(userId);
                             query.addListenerForSingleValueEvent(new ValueEventListener() {
 
@@ -144,7 +144,7 @@ public class FacebookIntegration extends AppCompatActivity implements LocationLi
                                         addNewUserToBlock(userId.toString());
                                         Map<String, Object> map = new HashMap<>();
                                         map.put("blocked", loginUserList);
-                                        map.put("name", userName);
+                                        map.put("name", name);
                                         map.put("username", userId);
                                         map.put("source", "fb");
                                         map.put("status", true);
