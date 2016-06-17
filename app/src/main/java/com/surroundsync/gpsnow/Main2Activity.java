@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -76,6 +77,7 @@ public class Main2Activity extends AppCompatActivity
 
     public static DatabaseReference userChildRef;
 
+    int image=0;
     String name = null;
     String latitude = null;
     String longitude = null;
@@ -90,13 +92,18 @@ public class Main2Activity extends AppCompatActivity
     ListView listview;
 
     List<String> list;
+    public static ArrayList<Users> MapUsers = new ArrayList<Users>();
     List<String> listBlock;
     /*ArrayAdapter adapter;*/
 
     String registerduserID;
 
+    String name_of_mapUsers;
+
     List<UserDetails> userDetailsList = new ArrayList<>();
     ArrayList<String> registeredUsers = new ArrayList<>();
+
+    Button btnUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -165,6 +172,16 @@ public class Main2Activity extends AppCompatActivity
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
 
+       // btnUser = (Button)findViewById(R.id.btnUser);
+
+       // btnUser.setOnClickListener(new View.OnClickListener() {
+            //@Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(getBaseContext(),UserContent.class);
+//                startActivity(intent);
+//            }
+//        });
+
 
         /*Menu m =navigationView.getMenu();
         SubMenu users = m.addSubMenu("Users");
@@ -185,9 +202,14 @@ public class Main2Activity extends AppCompatActivity
         Menu m = navigationView.getMenu();
         SubMenu users = m.addSubMenu("Users");
 
+
         for (final UserDetails details : list) {
 
             registerduserID = details.getUserId();
+
+            name_of_mapUsers = details.getName();
+
+            MapUsers.add(new Users(name_of_mapUsers));
 
             registeredUsers.add(registerduserID);
 
@@ -273,6 +295,8 @@ public class Main2Activity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(getBaseContext(),UserContent.class);
+            startActivity(intent);
             return true;
         }
 
@@ -383,6 +407,7 @@ public class Main2Activity extends AppCompatActivity
                     latitude = snapshot.child("latitude").getValue().toString();
                     status = (boolean) snapshot.child("status").getValue();
                     usersId = snapshot.child("username").getValue().toString();
+
 
                     x = Double.parseDouble(latitude);
                     y = Double.parseDouble(longitude);

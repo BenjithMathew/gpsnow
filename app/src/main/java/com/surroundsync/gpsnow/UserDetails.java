@@ -11,6 +11,7 @@ public class UserDetails {
     boolean status;
     String userId;
 
+
     UserDetails(){
 
     }
