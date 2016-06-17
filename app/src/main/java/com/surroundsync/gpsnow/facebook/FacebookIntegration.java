@@ -238,7 +238,7 @@ public class FacebookIntegration extends AppCompatActivity implements LocationLi
 
 
 //<---Retrieving all login users data from the firebase
-private void fetchingAllLoginUserIdList() {
+public void fetchingAllLoginUserIdList() {
         ref.child("login").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
