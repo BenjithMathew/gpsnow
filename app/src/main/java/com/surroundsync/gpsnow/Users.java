@@ -5,16 +5,16 @@ package com.surroundsync.gpsnow;
  */
 public class Users {
     String name;
-
-
+    String userId;
 
     Users(){
         super();
     }
 
-    public Users(String name) {
+    public Users(String name, String userId) {
         super();
         this.name = name;
+        this.userId = userId;
     }
 
     public String getName() {
@@ -23,5 +23,13 @@ public class Users {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

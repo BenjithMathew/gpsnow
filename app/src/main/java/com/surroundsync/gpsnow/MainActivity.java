@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     String knownArea;
     String subLocation;
     DatabaseReference userChildRef, ref;
-    ArrayList<String> blockUser;
+    List<String> blockUser;
     public List<String> allUsersBlockedlist;
     private String allUsersId;
 

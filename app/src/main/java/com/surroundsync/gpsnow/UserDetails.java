@@ -16,6 +16,10 @@ public class UserDetails {
 
     }
 
+    public UserDetails(String userId) {
+        this.userId = userId;
+    }
+
     public UserDetails(String name, String latitude, String longitude, boolean status, String userId) {
         this.name = name;
         this.latitude = latitude;

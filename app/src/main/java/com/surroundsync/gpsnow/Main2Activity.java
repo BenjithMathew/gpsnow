@@ -49,7 +49,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, LocationListener {
@@ -93,10 +92,9 @@ public class Main2Activity extends AppCompatActivity
 
     List<String> list;
     public static ArrayList<Users> MapUsers = new ArrayList<Users>();
-    List<String> listBlock;
-    /*ArrayAdapter adapter;*/
+    public static ArrayList<Users>MapusersId = new ArrayList<Users>();
 
-    String registerduserID;
+    public String registerduserID;
 
     String name_of_mapUsers;
 
@@ -171,37 +169,16 @@ public class Main2Activity extends AppCompatActivity
         toggle.syncState();
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
-
-       // btnUser = (Button)findViewById(R.id.btnUser);
-
-       // btnUser.setOnClickListener(new View.OnClickListener() {
-            //@Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(getBaseContext(),UserContent.class);
-//                startActivity(intent);
-//            }
-//        });
-
-
-        /*Menu m =navigationView.getMenu();
-        SubMenu users = m.addSubMenu("Users");
-        users.add("me");*/
         navigationView.setNavigationItemSelectedListener(this);
-
-        /*listview= (ListView)findViewById(R.id.activity_list_nav_main2);*/
-
-        /*adapter = new ArrayAdapter(getBaseContext(),android.R.layout.simple_list_item_1,registeredUsers);
-
-        listview.setAdapter(adapter);*/
-
 
     }
 
     private void addItemsToDrawer(List<UserDetails> list) {
 
+        MapUsers.clear();
+
         Menu m = navigationView.getMenu();
         SubMenu users = m.addSubMenu("Users");
-
 
         for (final UserDetails details : list) {
 
@@ -209,7 +186,7 @@ public class Main2Activity extends AppCompatActivity
 
             name_of_mapUsers = details.getName();
 
-            MapUsers.add(new Users(name_of_mapUsers));
+            MapUsers.add(new Users(name_of_mapUsers, registerduserID));
 
             registeredUsers.add(registerduserID);
 
@@ -220,49 +197,7 @@ public class Main2Activity extends AppCompatActivity
                     Toast.makeText(Main2Activity.this, " title : " + item.getTitle(), Toast.LENGTH_SHORT).show();
 
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(Double.parseDouble(details.getLatitude()), Double.parseDouble(details.getLongitude())), 20.0f));
-
-
-                    dontShowMapLocation(details.getUserId());
                     return false;
-                }
-            });
-
-        }
-
-        /*m.add(name);*/
-
-        /*MenuItem mi = m.getItem(m.size()-1);
-        mi.setTitle(mi.getTitle());*/
-
-    }
-
-    private void dontShowMapLocation(final String userId) {
-
-        if(list.contains(userId)){
-
-            userChildRef = mDatabase.child("gpsnow").child("login");
-            userChildRef.child(userId).child("blocked").addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    GenericTypeIndicator<List<String>> typeIndicator = new GenericTypeIndicator<List<String>>() {
-                    };
-                    listBlock = dataSnapshot.getValue(typeIndicator);
-
-                    if(listBlock.contains(userName)){
-                        Map<String, Object> map = new HashMap<>();
-                        listBlock.remove(userName);
-
-                        map.put("blocked", listBlock);
-                        userChildRef.child(userId).updateChildren(map);
-
-                    }
-
-
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
                 }
             });
 
@@ -281,21 +216,19 @@ public class Main2Activity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+
         getMenuInflater().inflate(R.menu.main2, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             Intent intent = new Intent(getBaseContext(),UserContent.class);
+            intent.putExtra("username", userName);
             startActivity(intent);
             return true;
         }
@@ -322,7 +255,6 @@ public class Main2Activity extends AppCompatActivity
                         public void onDataChange(DataSnapshot dataSnapshot) {
 
                             if (dataSnapshot.getValue() != null) {
-                                // Get user value
 
                                 HashMap<String, Object> result = new HashMap<>();
                                 result.put("status", false);
@@ -331,7 +263,6 @@ public class Main2Activity extends AppCompatActivity
                                 Intent intent = new Intent(getBaseContext(), MainActivity.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                 startActivity(intent);
-                                // Handle the camera action
                             }
                         }
 
@@ -360,9 +291,7 @@ public class Main2Activity extends AppCompatActivity
         googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         Log.d("onMapReady", "method completed");
 
-
     }
-
 
     public void loginUser() {
 
@@ -376,9 +305,6 @@ public class Main2Activity extends AppCompatActivity
                 GenericTypeIndicator<List<String>> typeIndicator = new GenericTypeIndicator<List<String>>() {
                 };
                  list = dataSnapshot.getValue(typeIndicator);
-                    /*String a = listOfBlockedUsers.getValue().toString();*/
-
-                /*blockList.add(String.valueOf(listOfBlockedUsers.getKey()));*/
 
                 Log.d("login blocklist list", "" + list.toString());
                 showMap(list);
@@ -391,7 +317,6 @@ public class Main2Activity extends AppCompatActivity
             }
         });
     }
-
 
     private void showMap(final List<String> blockL) {
         Log.d("showmap", "showmapstarts");
@@ -427,7 +352,6 @@ public class Main2Activity extends AppCompatActivity
 
     }
 
-
     private void fetchingDataFromFirebase() {
 
         userChildRef = mDatabase.child("gpsnow");
@@ -444,21 +368,15 @@ public class Main2Activity extends AppCompatActivity
                     usersId = snapshot.child("username").getValue().toString();
                     String a = snapshot.child("blocked").getValue().toString();
 
-                    //blockList.add(a);
 
                     x = Double.parseDouble(latitude);
                     y = Double.parseDouble(longitude);
                     UserDetails object = new UserDetails(name, latitude, longitude, status, usersId);
                     userDetailsList.add(object);
 
-                    //  createMarker(x,y,name,usersId,status,registeredUsers);
-
-
                 }
 
                 addItemsToDrawer(userDetailsList);
-
-
             }
 
             @Override
@@ -475,7 +393,6 @@ public class Main2Activity extends AppCompatActivity
             if (listofBlockedUsers.equals(usersID)) {
 
                 mMap.addMarker(new MarkerOptions().position(new LatLng(x, y)).anchor(0.5f, 0.5f).title(name).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-
 
             }
         }
