@@ -1,14 +1,12 @@
 package com.surroundsync.gpsnow.googleplus;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -22,6 +20,8 @@ import android.widget.Toast;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
+import com.firebase.client.GenericTypeIndicator;
+import com.firebase.client.Query;
 import com.firebase.client.ValueEventListener;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -35,8 +35,9 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.surroundsync.gpsnow.R;
 
-import java.security.Provider;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class GoolePlus extends AppCompatActivity implements View.OnClickListener,
@@ -44,11 +45,6 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
 
 
     private static final int RC_GOOOGLE_SIGN_IN = 546;
-    ;
-
-    /*DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
-
-    DatabaseReference ref = mRootRef.child("gpsnow");*/
 
     Firebase ref;
 
@@ -90,6 +86,14 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
 
     boolean isNetworkEnabled;
 
+    String allUsersId = null;
+
+    private List<String> allUsersBlockedlist ;
+
+    private ArrayList<String> loginUserList;
+
+    Firebase childRef;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,6 +103,7 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
 
 
         ref = new Firebase("https://gpstodo.firebaseio.com/gpsnow/login");
+        childRef = new Firebase("https://gpstodo.firebaseio.com/gpsnow");
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
 
@@ -131,6 +136,30 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
             return;
         }
         location = locationManager.getLastKnownLocation(provider);
+        if (location != null) {
+            location = locationManager.getLastKnownLocation(provider);
+        } else {
+            List<String> providers = locationManager.getProviders(true);
+            Location bestLocation = null;
+            for (String provider : providers) {
+
+                Location l = locationManager.getLastKnownLocation(provider);
+                if (l == null) {
+                    continue;
+                }
+                if (bestLocation == null
+                        || l.getAccuracy() < bestLocation.getAccuracy()) {
+                    bestLocation = l;
+                }
+            }
+            if (bestLocation == null) {
+                bestLocation = null;
+                Toast.makeText(this, "Location not available", Toast.LENGTH_SHORT).show();
+            }
+            location = bestLocation;
+            Log.d("locationlog", "location :" + location);
+            location();
+        }
 
         //--------------for signiin button---------
         googleplus_signin_button = (SignInButton) findViewById(R.id.activity_googleplus_btn_signin);
@@ -146,6 +175,8 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
         etGoogleemail = (EditText) findViewById(R.id.activity_etgplus_email);
         etGoogleID = (EditText) findViewById(R.id.activity_etgplus_ID);
 
+        allUsersBlockedlist = new ArrayList<>();
+        loginUserList = new ArrayList<>();
 
         googleplus_signin_button.setOnClickListener(this);
         googleplus_signout_button.setOnClickListener(this);
@@ -176,7 +207,6 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
                 }
             });
         }
-        //mGoogleApiClient.connect();
     }
 
 
@@ -244,12 +274,10 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
 
                 loadData.put("latitude", latitude);
                 loadData.put("longitude", longitude);
-                loadData.put("name", displayName);
-                loadData.put("source", "g+");
                 loadData.put("status", status);
-                loadData.put("userId", userId);
 
-                ref.child(userId).setValue(loadData);
+
+                ref.child(userId).updateChildren(loadData);
 
             }
 
@@ -264,9 +292,11 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
 
     private void googleSignIn() {
 
+        fetchingAllLoginUserIdList();
+        location();
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RC_GOOOGLE_SIGN_IN);
-        location();
+
     }
 
 
@@ -321,21 +351,43 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
 
             displayName = acct.getDisplayName();
 
-            //final Query query = ref.child("login");
+            Query query = childRef.child("login").child(userId);
 
-            ref.addListenerForSingleValueEvent(new ValueEventListener() {
+
+            query.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    Map<String, Object> loadData = new HashMap<String, Object>();
 
-                    loadData.put("latitude", latitude);
-                    loadData.put("longitude", longitude);
-                    loadData.put("name", displayName);
-                    loadData.put("source", "g+");
-                    loadData.put("status", status);
-                    loadData.put("userId", acct.getId());
 
-                    ref.child(acct.getId()).setValue(loadData);
+                    if(dataSnapshot.getValue()==null) {
+
+                        Log.d("snapshot", " list " + dataSnapshot);
+
+                        fetchingAllLoginUserIdList();
+                        addNewUserToBlock(userId);
+
+                        Map<String, Object> loadData = new HashMap<String, Object>();
+
+                        loadData.put("latitude", latitude);
+                        loadData.put("longitude", longitude);
+                        loadData.put("name", displayName);
+                        loadData.put("source", "g+");
+                        loadData.put("status", status);
+                        loadData.put("username", userId);
+                        loadData.put("blocked", loginUserList);
+
+                       ref.child(userId).setValue(loadData);
+
+                    }else{
+
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("latitude", latitude);
+                        map.put("longitude", longitude);
+                        map.put("status", status);
+
+                        childRef.child("login").child(userId).updateChildren(map);
+
+                    }
                 }
 
                 @Override
@@ -346,11 +398,74 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
 
             updateUI(true);
         } else {
-            // Signed out, show unauthenticated UI.
             updateUI(false);
         }
     }
 
+    //<---Retrieving all login users data from the firebase
+
+    public void fetchingAllLoginUserIdList() {
+        childRef.child("login").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                loginUserList.clear();
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String userId = snapshot.getKey().toString();
+                    loginUserList.add(userId);
+                }
+
+
+                Log.d("block user", " blockuser: " + loginUserList);
+
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+
+        });
+        }
+
+
+    //--->Updating already login users blocked list with new user.
+
+    public void addNewUserToBlock(final String userName) {
+        childRef.child("login").addValueEventListener(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    if (!snapshot.getKey().toString().equals(userName)) {
+                        Log.d("snapshot", "" + snapshot);
+                        allUsersId = snapshot.child("username").getValue().toString();
+                        Log.d("alluserid", "" + allUsersId);
+                        GenericTypeIndicator<List<String>> typeIndicator = new GenericTypeIndicator<List<String>>() {
+                        };
+                        allUsersBlockedlist = snapshot.child("blocked").getValue(typeIndicator);
+                        Log.d("blocklist", "list" + allUsersBlockedlist);
+
+                        if (!allUsersBlockedlist.contains(userName)) {
+                            Log.d("insideblocklist", "" + allUsersBlockedlist);
+                            Map<String, Object> map = new HashMap<>();
+                            allUsersBlockedlist.add(userName);
+                            map.put("blocked", allUsersBlockedlist);
+                            childRef.child("login").child(allUsersId).updateChildren(map);
+                        }
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+
+        });
+        }
 
     public void location(){
 
