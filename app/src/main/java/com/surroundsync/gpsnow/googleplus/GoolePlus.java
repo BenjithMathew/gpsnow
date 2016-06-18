@@ -14,7 +14,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.firebase.client.DataSnapshot;
@@ -40,9 +39,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 public class GoolePlus extends AppCompatActivity implements View.OnClickListener,
         GoogleApiClient.OnConnectionFailedListener {
-
 
     private static final int RC_GOOOGLE_SIGN_IN = 546;
 
@@ -56,23 +55,21 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
 
     private Button googleplus_signout_button;
 
-    private EditText etGooglename, etGoogleemail, etGoogleID;
-
     private ProgressDialog mProgressDialog;
 
     private double currentLatitude;
 
     private double currentLongitude;
 
-    private String latitude =null;
+    private String latitude = null;
 
     private String longitude = null;
 
     boolean status = false;
 
-    String userId = null;
+    public String userId = null;
 
-    String displayName = null;
+    public String displayName = null;
 
     private LocationManager locationManager;
 
@@ -86,13 +83,13 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
 
     boolean isNetworkEnabled;
 
-    String allUsersId = null;
+    public String allUsersId = null;
 
-    private List<String> allUsersBlockedlist ;
+    private List<String> allUsersBlockedlist;
 
     private ArrayList<String> loginUserList;
 
-    Firebase childRef;
+    public Firebase childRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,7 +97,6 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
 
         Firebase.setAndroidContext(this);
         setContentView(R.layout.content_goole_plus);
-
 
         ref = new Firebase("https://gpstodo.firebaseio.com/gpsnow/login");
         childRef = new Firebase("https://gpstodo.firebaseio.com/gpsnow");
@@ -110,7 +106,6 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
-
 
         // Build a GoogleApiClient with access to the Google Sign-In API and the
         // options specified by gso.
@@ -135,10 +130,15 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
+
         location = locationManager.getLastKnownLocation(provider);
+
         if (location != null) {
+
             location = locationManager.getLastKnownLocation(provider);
+
         } else {
+
             List<String> providers = locationManager.getProviders(true);
             Location bestLocation = null;
             for (String provider : providers) {
@@ -162,25 +162,21 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
         }
 
         //--------------for signiin button---------
-        googleplus_signin_button = (SignInButton) findViewById(R.id.activity_googleplus_btn_signin);
 
+        googleplus_signin_button = (SignInButton) findViewById(R.id.activity_googleplus_btn_signin);
         googleplus_signin_button.setSize(SignInButton.SIZE_STANDARD);
         googleplus_signin_button.setColorScheme(SignInButton.COLOR_DARK);
         googleplus_signin_button.setScopes(gso.getScopeArray());
 
-        //-----------------------
+        //-------------for signout button------------------
 
         googleplus_signout_button = (Button) findViewById(R.id.activity_googleplus_btn_signout);
-        etGooglename = (EditText) findViewById(R.id.activity_etgplus_name);
-        etGoogleemail = (EditText) findViewById(R.id.activity_etgplus_email);
-        etGoogleID = (EditText) findViewById(R.id.activity_etgplus_ID);
 
         allUsersBlockedlist = new ArrayList<>();
         loginUserList = new ArrayList<>();
 
         googleplus_signin_button.setOnClickListener(this);
         googleplus_signout_button.setOnClickListener(this);
-
 
     }
 
@@ -208,7 +204,6 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
             });
         }
     }
-
 
     private void hideProgressDialog() {
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
@@ -260,9 +255,6 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
                         // [END_EXCLUDE]
                     }
                 });
-        etGooglename.setText("");
-        etGoogleemail.setText("");
-        etGoogleID.setText("");
 
         status = false;
 
@@ -275,7 +267,6 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
                 loadData.put("latitude", latitude);
                 loadData.put("longitude", longitude);
                 loadData.put("status", status);
-
 
                 ref.child(userId).updateChildren(loadData);
 
@@ -312,14 +303,12 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
         }
     }
 
-
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
 
         // An unresolvable error has occurred and Google APIs (including Sign-In) will not
         // be available.
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
-
 
     }
 
@@ -338,12 +327,11 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
     private void handleSignInResult(GoogleSignInResult result) {
 
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
+
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
+
             final GoogleSignInAccount acct = result.getSignInAccount();
-            etGooglename.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
-            etGoogleemail.setText(acct.getEmail());
-            etGoogleID.setText(acct.getId());
 
             status = true;
 
@@ -353,13 +341,11 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
 
             Query query = childRef.child("login").child(userId);
 
-
             query.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
-
-                    if(dataSnapshot.getValue()==null) {
+                    if (dataSnapshot.getValue() == null) {
 
                         Log.d("snapshot", " list " + dataSnapshot);
 
@@ -376,9 +362,9 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
                         loadData.put("username", userId);
                         loadData.put("blocked", loginUserList);
 
-                       ref.child(userId).setValue(loadData);
+                        ref.child(userId).setValue(loadData);
 
-                    }else{
+                    } else {
 
                         Map<String, Object> map = new HashMap<>();
                         map.put("latitude", latitude);
@@ -397,7 +383,9 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
             });
 
             updateUI(true);
+
         } else {
+
             updateUI(false);
         }
     }
@@ -414,8 +402,6 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
                     String userId = snapshot.getKey().toString();
                     loginUserList.add(userId);
                 }
-
-
                 Log.d("block user", " blockuser: " + loginUserList);
 
             }
@@ -426,7 +412,7 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
             }
 
         });
-        }
+    }
 
 
     //--->Updating already login users blocked list with new user.
@@ -456,7 +442,6 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
                         }
                     }
                 }
-
             }
 
             @Override
@@ -465,15 +450,15 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
             }
 
         });
-        }
+    }
 
-    public void location(){
+    public void location() {
 
-        if(!isGPSenabled){
+        if (!isGPSenabled) {
             Toast.makeText(GoolePlus.this, "Location is not available !! Turn on GPS ", Toast.LENGTH_SHORT).show();
-        }else if(!isNetworkEnabled){
+        } else if (!isNetworkEnabled) {
             Toast.makeText(GoolePlus.this, "Network is currently not available", Toast.LENGTH_SHORT).show();
-        }else{
+        } else {
             currentLatitude = location.getLatitude();
 
             latitude = String.valueOf(currentLatitude);
