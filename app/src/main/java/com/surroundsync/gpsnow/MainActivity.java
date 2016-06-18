@@ -39,9 +39,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private String provider;
     private String stringLatitude = null;
     private String stringLongitude = null;
-    List<String> listBlock;
     String passwordFromServer, userNameFromServer, nameFromServer;
-
     private EditText etUsername;
     private EditText etPassword;
     private Button btnLogin;
@@ -59,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     String country;
     String knownArea;
     String subLocation;
-    DatabaseReference userChildRef, ref;
+    DatabaseReference userChildRef;
     List<String> blockUser;
     public List<String> allUsersBlockedlist;
     private String allUsersId;
@@ -76,9 +74,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
         blockUser = new ArrayList<String>();
-
-
-
         /*btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -145,9 +140,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 final String userName = etUsername.getText().toString();
                 final String password = etPassword.getText().toString();
 
-
                 userChildRef = mDatabase.child("gpsnow");
-
                 fetchingDataFromFirebase();
                 userChildRef.child("users").child(userName).addListenerForSingleValueEvent(
                         new ValueEventListener() {
@@ -166,12 +159,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                                             @Override
                                             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                                if (dataSnapshot.getValue() == null) {
+                                                if (dataSnapshot.getValue()== null) {
 
                                                     addUserToBlock(userName);
-
                                                     loginStatus = true;
-                                                    Toast.makeText(MainActivity.this, "validation success.", Toast.LENGTH_SHORT).show();
+
+                                                    Toast.makeText(MainActivity.this, "Login success", Toast.LENGTH_SHORT).show();
                                                     HashMap<String, Object> result = new HashMap<>();
                                                     result.put("username", userName);
                                                     result.put("latitude", stringLatitude);
@@ -179,24 +172,26 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                                                     result.put("name", nameFromServer);
                                                     result.put("status", loginStatus);
                                                     result.put("blocked", blockUser);
-                                                    Log.d("blocked users", " all firebase userID" + blockUser);
                                                     userChildRef.child("login").child(userName).setValue(result);
+
                                                     Intent intent = new Intent(getBaseContext(), Main2Activity.class);
                                                     intent.putExtra("username", userName);
-                                                    Log.d("Start Map Activity", "intent to start");
                                                     startActivity(intent);
-                                                    Log.d("Start Map Activity", "intent started");
+                                                    overridePendingTransition(R.anim.right_slide_in, R.anim.left_slide_out);
+
                                                 } else {
                                                     loginStatus = true;
-                                                    Toast.makeText(MainActivity.this, "validation success.", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(MainActivity.this, "Login success", Toast.LENGTH_SHORT).show();
                                                     HashMap<String, Object> result = new HashMap<>();
                                                     result.put("latitude", stringLatitude);
                                                     result.put("longitude", stringLongitude);
                                                     result.put("status", loginStatus);
                                                     userChildRef.child("login").child(userName).updateChildren(result);
+
                                                     Intent intent = new Intent(getBaseContext(), Main2Activity.class);
                                                     intent.putExtra("username", userName);
                                                     startActivity(intent);
+                                                    overridePendingTransition(R.anim.right_slide_in, R.anim.left_slide_out);
 
                                                 }
                                             }
@@ -217,10 +212,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                                 }
 
                             }
-
-
-                            // ...
-
 
                             @Override
                             public void onCancelled(DatabaseError databaseError) {
@@ -250,8 +241,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                         allUsersBlockedlist = snapshot.child("blocked").getValue(typeIndicator);
                         Log.d("blocklist", "list" + allUsersBlockedlist);
 
-                        if(!allUsersBlockedlist.contains(userName)) {
-                            Log.d("insideblocklist",""+allUsersBlockedlist);
+                        if (!allUsersBlockedlist.contains(userName)) {
+                            Log.d("insideblocklist", "" + allUsersBlockedlist);
                             Map<String, Object> map = new HashMap<>();
                             allUsersBlockedlist.add(userName);
                             map.put("blocked", allUsersBlockedlist);
@@ -295,6 +286,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     }
 
+
     private void fetchingDataFromFirebase() {
 
         userChildRef = mDatabase.child("gpsnow");
@@ -303,22 +295,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             public void onDataChange(DataSnapshot dataSnapshot) {
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-
-
-                    Log.d("data", " value : " + dataSnapshot.getValue());
-                    String name = snapshot.child("name").getValue().toString();
-                    String longitude = snapshot.child("longitude").getValue().toString();
-                    String latitude = snapshot.child("latitude").getValue().toString();
-                    boolean status = (boolean) snapshot.child("status").getValue();
-                    String userId = snapshot.child("username").getValue().toString();
-
-                    double x = Double.parseDouble(latitude);
-                    double y = Double.parseDouble(longitude);
-
-                    blockUser.add(userId);
+                     String userId = snapshot.child("username").getValue().toString();
+                     blockUser.add(userId);
 
                 }
-                Log.d("block user", " blockuser: " + blockUser.toString());
 
             }
 

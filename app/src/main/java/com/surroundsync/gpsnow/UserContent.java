@@ -16,38 +16,30 @@ import java.util.ArrayList;
  */
 public class UserContent extends AppCompatActivity implements  Cloneable{
 
-    ArrayList<Users> users = new ArrayList<>();
-    ArrayList<Users> usersIds = new ArrayList<>();
+    private ArrayList<Users> users = new ArrayList<>();
+    private ArrayList<Users> usersIds = new ArrayList<>();
 
-    ListView lvListView;
-    ToggleButton btnToggle;
-    static String userName;
-
-    DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
-    DatabaseReference myRef = rootRef.child("gpsnow");
+    private ListView lvListView;
+    private ToggleButton btnToggle;
+    private static String userName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.custom_listview);
         userName = getIntent().getStringExtra("username");
-        Log.d("Users","username"+userName);
-
         users = Main2Activity.MapUsers;
         usersIds = Main2Activity.MapusersId;
-
-        Log.d("List", "MapUsers"+users);
-
         final UserHandle adapter = new UserHandle(this, users);
-
         btnToggle = (ToggleButton) findViewById(R.id.toggleButton);
         lvListView =(ListView)findViewById(R.id.listView);
         lvListView.setAdapter(adapter);
 
     }
 
-
-
-
-
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.left_slide_in, R.anim.right_slide_out);
+    }
 }
