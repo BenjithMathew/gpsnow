@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:402095586877:android:7a1b44d998814fa6",
         "android_client_info": {
-          "package_name": "com.surroundsync.gpsnow"
+          "package_name": "com.example.ashrayjoshi.gps"
         }
       },
       "oauth_client": [
@@ -45,6 +45,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "402095586877-qn0sjmo6kdk33u3ls2kpu3tqaujnce9r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.surroundsync.gpsnow",
+            "certificate_hash": "5255C65428473F1562BB1050886EB06F6F434AEC"
+          }
+        },
         {
           "client_id": "402095586877-f2m726d57du5unsjagcqp64hnpeocour.apps.googleusercontent.com",
           "client_type": 3

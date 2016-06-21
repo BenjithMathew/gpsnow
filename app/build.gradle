@@ -17,16 +17,27 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    packagingOptions{
+        exclude 'META-INF/NOTICE' // will not include notice file
+        exclude 'META-INF/LICENSE' // will not include license file
+    }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
+    compile 'com.google.android.gms:play-services-auth:9.0.2'
     compile 'com.android.support:appcompat-v7:23.4.0'
     compile 'com.facebook.android:facebook-android-sdk:[4,5)'
     compile 'com.google.firebase:firebase-core:9.0.1'
     compile 'com.firebase:firebase-client-android:2.4.0'
     compile 'com.google.firebase:firebase-database:9.0.1'
     compile 'com.google.android.gms:play-services-appindexing:9.0.1'
+    compile 'com.android.support:design:23.4.0'
+    compile 'de.hdodenhof:circleimageview:1.3.0'
+    compile 'com.google.android.gms:play-services-plus:9.0.2'
+    
+
 }
 apply plugin: 'com.google.gms.google-services'

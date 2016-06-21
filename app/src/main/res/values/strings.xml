@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">Gpsnow</string>
+    <string name="title_activity_goole_plus">GoolePlus</string>
+    <string name="signed_in_fmt">%s</string>
+    <string name="loading">Loading…</string>
+
+    <string name="server_client_id">206030141834-gpk0gqulpos42hdv3rtu85obuer69465.apps.googleusercontent.com</string>
     <string name="facebook_app_id">548190908697244</string>
+
 </resources>
