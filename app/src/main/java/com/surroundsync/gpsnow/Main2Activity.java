@@ -142,18 +142,20 @@ public class Main2Activity extends AppCompatActivity
         for (final UserDetails details : list) {
             registerduserID = details.getUserId();
             name_of_mapUsers = details.getName();
-            MapUsers.add(new Users(name_of_mapUsers, registerduserID));
-            registeredUsers.add(registerduserID);
-            users.add(details.getName()).setTitle(details.getName()).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
+            if(! name_of_mapUsers.equals(userName)) {
+                MapUsers.add(new Users(name_of_mapUsers, registerduserID));
+                registeredUsers.add(registerduserID);
+                users.add(details.getName()).setTitle(details.getName()).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
 
-                    Toast.makeText(Main2Activity.this, " title : " + item.getTitle(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(Main2Activity.this, " " + item.getTitle(), Toast.LENGTH_SHORT).show();
 
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(Double.parseDouble(details.getLatitude()), Double.parseDouble(details.getLongitude())), 20.0f));
-                    return false;
-                }
-            });
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(Double.parseDouble(details.getLatitude()), Double.parseDouble(details.getLongitude())), 20.0f));
+                        return false;
+                    }
+                });
+            }
 
         }
     }

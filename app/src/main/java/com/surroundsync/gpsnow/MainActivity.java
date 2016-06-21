@@ -3,7 +3,6 @@ package com.surroundsync.gpsnow;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Criteria;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -23,11 +22,9 @@ import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 
@@ -46,17 +43,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private Button btnSignUp;
     boolean loginStatus = false;
     private Criteria criteria;
-    private Geocoder geocoder;
     private List<Address> address;
     private double latitude;
     private double longitude;
     private DatabaseReference mDatabase;
-    String myAddress;
-    String city;
-    String state;
-    String country;
-    String knownArea;
-    String subLocation;
     DatabaseReference userChildRef;
     List<String> blockUser;
     public List<String> allUsersBlockedlist;
@@ -117,20 +107,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             longitude = location.getLongitude();
             stringLongitude = String.valueOf(longitude);
         }
-        geocoder = new Geocoder(this, Locale.getDefault());
-        try {
-            address = geocoder.getFromLocation(latitude, longitude, 1);
-
-            myAddress = address.get(0).getAddressLine(0);
-            city = address.get(0).getLocality();
-            state = address.get(0).getAdminArea();
-            country = address.get(0).getCountryName();
-            knownArea = address.get(0).getFeatureName();
-            subLocation = address.get(0).getSubLocality();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
 
