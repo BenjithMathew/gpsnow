@@ -1,13 +1,11 @@
 package com.surroundsync.gpsnow;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.ListView;
 import android.widget.ToggleButton;
-
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
@@ -16,12 +14,14 @@ import java.util.ArrayList;
  */
 public class UserContent extends AppCompatActivity implements  Cloneable{
 
-    private ArrayList<Users> users = new ArrayList<>();
-    private ArrayList<Users> usersIds = new ArrayList<>();
+    public ArrayList<Users> users = new ArrayList<>();
+    public ArrayList<Users> usersIds = new ArrayList<>();
 
     private ListView lvListView;
     private ToggleButton btnToggle;
-    private static String userName;
+    public static String userName;
+
+    SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +34,10 @@ public class UserContent extends AppCompatActivity implements  Cloneable{
         btnToggle = (ToggleButton) findViewById(R.id.toggleButton);
         lvListView =(ListView)findViewById(R.id.listView);
         lvListView.setAdapter(adapter);
+
+        sharedPreferences =getSharedPreferences("Logout.MyPREFERENCES", Context.MODE_PRIVATE);
+
+
 
     }
 

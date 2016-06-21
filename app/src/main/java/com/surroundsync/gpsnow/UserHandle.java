@@ -35,6 +35,7 @@ public class UserHandle extends ArrayAdapter<Users> {
     String idName = null;
 
 
+
     public UserHandle(Context context, ArrayList<Users> users) {
         super(context, R.layout.custom_row_listview, users);
 
@@ -69,9 +70,14 @@ public class UserHandle extends ArrayAdapter<Users> {
 
 
                 if (isChecked) {
+                    /*SharedPreferences sharedpreferences = getSharedPreference("Logout.MyPREFERENCES", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedpreferences.edit();
+                    editor.clear();*/
+                   // editor.commit();
                     idName = user.getUserId();
                     Log.d("idname", idName.toString());
                     dontShowMapLocation(idName);
+
 
 
                 } else {

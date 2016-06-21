@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                                     passwordFromServer = (String) dataSnapshot.child("password").getValue();
                                     nameFromServer = (String) dataSnapshot.child("name").getValue();
                                     if (passwordFromServer.equals(password)) {
-
+                                        //query for checking weather the user is a new user or a already logged in user
                                         Query query = userChildRef.child("login").child(userName);
                                         query.addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
@@ -286,7 +286,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     }
 
-
+//fetching all login users
     private void fetchingDataFromFirebase() {
 
         userChildRef = mDatabase.child("gpsnow");
