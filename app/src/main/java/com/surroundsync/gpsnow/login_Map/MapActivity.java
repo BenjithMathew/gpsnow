@@ -1,4 +1,4 @@
-package com.surroundsync.gpsnow;
+package com.surroundsync.gpsnow.login_Map;
 
 import android.content.Context;
 import android.content.Intent;
@@ -36,6 +36,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
+import com.surroundsync.gpsnow.R;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -198,6 +199,11 @@ public class MapActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_logout) {
+
+
+
+
+
             SharedPreferences sharedpreferences = getSharedPreferences("Logout.MyPREFERENCES", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedpreferences.edit();
             editor.clear();

@@ -1,4 +1,4 @@
-package com.surroundsync.gpsnow;
+package com.surroundsync.gpsnow.login_Map;
 
 import android.content.Intent;
 import android.location.Address;
@@ -21,6 +21,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.surroundsync.gpsnow.R;
+import com.surroundsync.gpsnow.registration.NewUserRegistration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class LoginActivity extends AppCompatActivity implements LocationListener {
+public class LoginActivity extends AppCompatActivity implements LocationListener,View.OnClickListener {
 
     private static final String TAG = "EmailPassword";
     private LocationManager locationManager;
@@ -60,8 +62,11 @@ public class LoginActivity extends AppCompatActivity implements LocationListener
         etUsername = (EditText) findViewById(R.id.activity_username_et_login);
         etPassword = (EditText) findViewById(R.id.activity_pass_et_login);
         btnLogin = (Button) findViewById(R.id.activity_btn_login_ma);
+        btnSignUp.setOnClickListener(this);
+
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
+
 
         blockUser = new ArrayList<String>();
 
@@ -279,5 +284,11 @@ public class LoginActivity extends AppCompatActivity implements LocationListener
             }
 
         });
+    }
+
+    @Override
+    public void onClick(View v) {
+        Intent intent = new Intent(getBaseContext(), NewUserRegistration.class);
+        startActivity(intent);
     }
 }

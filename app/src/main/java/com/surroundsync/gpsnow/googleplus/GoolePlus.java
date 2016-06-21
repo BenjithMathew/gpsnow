@@ -31,7 +31,6 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.surroundsync.gpsnow.R;
 
 import java.util.ArrayList;
@@ -96,7 +95,7 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
         super.onCreate(savedInstanceState);
 
         Firebase.setAndroidContext(this);
-        setContentView(R.layout.content_goole_plus);
+        setContentView(R.layout.activity_start);
 
         ref = new Firebase("https://gpstodo.firebaseio.com/gpsnow/login");
         childRef = new Firebase("https://gpstodo.firebaseio.com/gpsnow");
@@ -170,7 +169,6 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
 
         //-------------for signout button------------------
 
-        googleplus_signout_button = (Button) findViewById(R.id.activity_googleplus_btn_signout);
 
         allUsersBlockedlist = new ArrayList<>();
         loginUserList = new ArrayList<>();
@@ -240,12 +238,11 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
                 googleSignIn();
                 break;
 
-            case R.id.activity_googleplus_btn_signout:
-                googleSignOut();
+
         }
     }
 
-    private void googleSignOut() {
+    /*private void googleSignOut() {
         Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
                 new ResultCallback<Status>() {
                     @Override
@@ -280,7 +277,7 @@ public class GoolePlus extends AppCompatActivity implements View.OnClickListener
 
 
     }
-
+*/
     private void googleSignIn() {
 
         fetchingAllLoginUserIdList();

@@ -1,4 +1,4 @@
-package com.surroundsync.gpsnow;
+package com.surroundsync.gpsnow.login_Map;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -18,6 +18,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
+import com.surroundsync.gpsnow.R;
 
 import java.util.ArrayList;
 

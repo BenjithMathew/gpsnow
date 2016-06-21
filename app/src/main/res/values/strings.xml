@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Gpsnow</string>
+    <string name="app_name">gpsnow</string>
     <string name="title_activity_goole_plus">GoolePlus</string>
     <string name="signed_in_fmt">%s</string>
     <string name="loading">Loading…</string>

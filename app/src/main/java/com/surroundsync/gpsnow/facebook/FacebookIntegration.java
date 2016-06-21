@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
 import com.facebook.CallbackManager;
@@ -33,6 +32,7 @@ import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.surroundsync.gpsnow.R;
+import com.surroundsync.gpsnow.login_Map.MapActivity;
 
 import org.json.JSONObject;
 
@@ -68,7 +68,7 @@ public class FacebookIntegration extends AppCompatActivity implements LocationLi
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
         AppEventsLogger.activateApp(this);
-        setContentView(R.layout.activity_facebook_integration);
+        setContentView(R.layout.activity_start);
         loginUserList = new ArrayList<String>();
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -117,7 +117,7 @@ public class FacebookIntegration extends AppCompatActivity implements LocationLi
 
         callbackManager = CallbackManager.Factory.create();
         Firebase.setAndroidContext(this);
-        fbLoginButton = (LoginButton) findViewById(R.id.activity_facebook_login_button);
+        fbLoginButton = (LoginButton) findViewById(R.id.activity_fb_login_button);
         fbLoginButton.setReadPermissions("email");
         fbLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
@@ -153,12 +153,10 @@ public class FacebookIntegration extends AppCompatActivity implements LocationLi
                                         ref.child("login").child(userId).setValue(map);
                                         Toast.makeText(getBaseContext(), "You are online", LENGTH_SHORT).show();
 
-                                        /*Intent intent = new Intent(getBaseContext(), Main2Activity.class);
-                                        intent.putExtra("username", userName);
-                                        Log.d("Start Map Activity", "intent to start");
+                                        Intent intent = new Intent(getBaseContext(), MapActivity.class);
+                                        intent.putExtra("username", userId);
                                         startActivity(intent);
-                                        Log.d("Start Map Activity", "intent started");*/
-
+                                        overridePendingTransition(R.anim.right_slide_in, R.anim.left_slide_out);
 
                                     } else {
                                         Map<String, Object> map = new HashMap<>();
@@ -169,11 +167,10 @@ public class FacebookIntegration extends AppCompatActivity implements LocationLi
                                         Toast.makeText(getBaseContext(), "You are online", LENGTH_SHORT).show();
 
 
-                                          /*Intent intent = new Intent(getBaseContext(), Main2Activity.class);
-                                        intent.putExtra("username", userName);
-                                        Log.d("Start Map Activity", "intent to start");
+                                        Intent intent = new Intent(getBaseContext(), MapActivity.class);
+                                        intent.putExtra("username", userId);
                                         startActivity(intent);
-                                        Log.d("Start Map Activity", "intent started");*/
+                                        overridePendingTransition(R.anim.right_slide_in, R.anim.left_slide_out);
 
                                     }
                                 }
@@ -182,6 +179,7 @@ public class FacebookIntegration extends AppCompatActivity implements LocationLi
                                 public void onCancelled(DatabaseError databaseError) {
                                 }
                             });
+/*
 
                 //---->Facebook Logout button
                             fbLoginButton.setOnClickListener(new View.OnClickListener() {
@@ -209,6 +207,7 @@ public class FacebookIntegration extends AppCompatActivity implements LocationLi
 
                                 }
                             });
+*/
 
                         } catch (Exception e) {
                             e.printStackTrace();

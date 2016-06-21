@@ -4,14 +4,13 @@ import android.app.Activity;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
 import com.surroundsync.gpsnow.R;
-import com.surroundsync.gpsnow.facebook.FacebookIntegration;
+import com.surroundsync.gpsnow.startapp.StartActivity;
 
 public class Splash extends Activity {
     private ImageView ivlogo;
@@ -39,7 +38,7 @@ public class Splash extends Activity {
             public void onAnimationEnd(Animation animation) {
                 mMediaPlayer.stop();
                 finish();
-                Intent i = new Intent(getBaseContext(),FacebookIntegration.class);
+                Intent i = new Intent(getBaseContext(),StartActivity.class);
                 startActivity(i);
             }
 

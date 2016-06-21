@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:background="#fffaff"
+    android:layout_height="match_parent"
+    tools:context="com.surroundsync.gpsnow.facebook.FacebookIntegration">
+
+    <ImageView
+        android:padding="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/activity_start_ivMap"
+        android:src="@drawable/mylocation"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="56dp" />
+
+
+    <Button
+        android:layout_marginTop="15dp"
+        android:id="@+id/activity_start_btn_login"
+        android:text="Login"
+        android:textColor="#FFFFFF"
+        android:textSize="25sp"
+        android:layout_width="245dp"
+        android:layout_height="35dp"
+        android:background="@drawable/buttonshape"
+        android:shadowColor="#A8A8A8"
+        android:shadowDx="2"
+        android:shadowDy="1"
+        android:shadowRadius="5"
+        android:layout_below="@+id/activity_start_ivMap"
+        android:layout_centerHorizontal="true"
+        />
+
+    <com.facebook.login.widget.LoginButton
+        android:layout_marginTop="10dp"
+        android:id="@+id/activity_fb_login_button"
+        android:layout_width="245dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center_horizontal"
+        android:text="Log in with Facebook"
+        android:layout_below="@+id/activity_start_btn_login"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/activity_start_btn_signin"
+        android:layout_width="245dp"
+        android:layout_height="40dp"
+        android:layout_below="@+id/activity_fb_login_button"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+            />
+
+
+</RelativeLayout>

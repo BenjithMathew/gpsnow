@@ -1,9 +1,11 @@
-package com.surroundsync.gpsnow;
+package com.surroundsync.gpsnow.login_Map;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ListView;
 import android.widget.ToggleButton;
+
+import com.surroundsync.gpsnow.R;
 
 import java.util.ArrayList;
 
