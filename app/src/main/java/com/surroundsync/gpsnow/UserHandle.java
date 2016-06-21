@@ -1,6 +1,7 @@
 package com.surroundsync.gpsnow;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,9 +32,9 @@ public class UserHandle extends ArrayAdapter<Users> {
 
     ArrayList<String> blockedUserIds = new ArrayList<>();
     private ArrayList<String> blockedIds = new ArrayList<>();
+    SharedPreferences sharedprefernces;
 
     String idName = null;
-
 
 
     public UserHandle(Context context, ArrayList<Users> users) {
@@ -60,6 +61,7 @@ public class UserHandle extends ArrayAdapter<Users> {
             userHolder.tb = (ToggleButton) convertView.findViewById(R.id.toggleButton);
             convertView.setTag(userHolder);
 
+
         } else {
             userHolder = (UserHolder) convertView.getTag();
         }
@@ -70,15 +72,10 @@ public class UserHandle extends ArrayAdapter<Users> {
 
 
                 if (isChecked) {
-                    /*SharedPreferences sharedpreferences = getSharedPreference("Logout.MyPREFERENCES", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedpreferences.edit();
-                    editor.clear();*/
-                   // editor.commit();
+
                     idName = user.getUserId();
                     Log.d("idname", idName.toString());
                     dontShowMapLocation(idName);
-
-
 
                 } else {
                     idName = user.getUserId();

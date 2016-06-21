@@ -1,7 +1,5 @@
 package com.surroundsync.gpsnow;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ListView;
@@ -21,23 +19,18 @@ public class UserContent extends AppCompatActivity implements  Cloneable{
     private ToggleButton btnToggle;
     public static String userName;
 
-    SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.custom_listview);
         userName = getIntent().getStringExtra("username");
-        users = Main2Activity.MapUsers;
-        usersIds = Main2Activity.MapusersId;
+        users = MapActivity.MapUsers;
+        usersIds = MapActivity.MapusersId;
         final UserHandle adapter = new UserHandle(this, users);
         btnToggle = (ToggleButton) findViewById(R.id.toggleButton);
         lvListView =(ListView)findViewById(R.id.listView);
         lvListView.setAdapter(adapter);
-
-        sharedPreferences =getSharedPreferences("Logout.MyPREFERENCES", Context.MODE_PRIVATE);
-
-
 
     }
 

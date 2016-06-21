@@ -43,7 +43,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-public class Main2Activity extends AppCompatActivity
+public class MapActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, LocationListener {
 
     private GoogleMap mMap;
@@ -149,7 +149,7 @@ public class Main2Activity extends AppCompatActivity
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
 
-                        Toast.makeText(Main2Activity.this, " " + item.getTitle(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MapActivity.this, " " + item.getTitle(), Toast.LENGTH_SHORT).show();
 
                         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(Double.parseDouble(details.getLatitude()), Double.parseDouble(details.getLongitude())), 20.0f));
                         return false;
@@ -212,7 +212,7 @@ public class Main2Activity extends AppCompatActivity
                                 HashMap<String, Object> result = new HashMap<>();
                                 result.put("status", false);
                                 userChildRef.child("login").child(userName).updateChildren(result);
-                                Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                                Intent intent = new Intent(getBaseContext(), LoginActivity.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                 startActivity(intent);
                             }

@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class MainActivity extends AppCompatActivity implements LocationListener {
+public class LoginActivity extends AppCompatActivity implements LocationListener {
 
     private static final String TAG = "EmailPassword";
     private LocationManager locationManager;
@@ -64,13 +64,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
         blockUser = new ArrayList<String>();
-        /*btnSignUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, SignUpActivity.class);
-                startActivity(intent);
-            }
-        });*/
+
 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -141,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                                                     addUserToBlock(userName);
                                                     loginStatus = true;
 
-                                                    Toast.makeText(MainActivity.this, "Login success", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(LoginActivity.this, "Login success", Toast.LENGTH_SHORT).show();
                                                     HashMap<String, Object> result = new HashMap<>();
                                                     result.put("username", userName);
                                                     result.put("latitude", stringLatitude);
@@ -151,21 +145,21 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                                                     result.put("blocked", blockUser);
                                                     userChildRef.child("login").child(userName).setValue(result);
 
-                                                    Intent intent = new Intent(getBaseContext(), Main2Activity.class);
+                                                    Intent intent = new Intent(getBaseContext(), MapActivity.class);
                                                     intent.putExtra("username", userName);
                                                     startActivity(intent);
                                                     overridePendingTransition(R.anim.right_slide_in, R.anim.left_slide_out);
 
                                                 } else {
                                                     loginStatus = true;
-                                                    Toast.makeText(MainActivity.this, "Login success", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(LoginActivity.this, "Login success", Toast.LENGTH_SHORT).show();
                                                     HashMap<String, Object> result = new HashMap<>();
                                                     result.put("latitude", stringLatitude);
                                                     result.put("longitude", stringLongitude);
                                                     result.put("status", loginStatus);
                                                     userChildRef.child("login").child(userName).updateChildren(result);
 
-                                                    Intent intent = new Intent(getBaseContext(), Main2Activity.class);
+                                                    Intent intent = new Intent(getBaseContext(), MapActivity.class);
                                                     intent.putExtra("username", userName);
                                                     startActivity(intent);
                                                     overridePendingTransition(R.anim.right_slide_in, R.anim.left_slide_out);
@@ -179,13 +173,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                                         });
 
                                     } else {
-                                        Toast.makeText(MainActivity.this, "Password incorrect", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(LoginActivity.this, "Password incorrect", Toast.LENGTH_SHORT).show();
 
                                     }
 
 
                                 } else {
-                                    Toast.makeText(MainActivity.this, "your user name is not registered.", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(LoginActivity.this, "your user name is not registered.", Toast.LENGTH_SHORT).show();
                                 }
 
                             }
