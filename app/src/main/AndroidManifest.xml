@@ -16,25 +16,20 @@
             android:value="@string/facebook_app_id" />
 
         <activity android:name=".MainActivity" />
+
         <activity android:name=".facebook.FacebookIntegration">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-            </intent-filter>
         </activity>
+
         <activity android:name=".Splash.Splash">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-            </intent-filter>
-
-
-        </activity>
-        <activity android:name=".registration.NewUserRegistration">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity android:name=".registration.NewUserRegistration">
+
         </activity><!-- ATTENTION: This was auto-generated to add Google Play services to your project for
      App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
         <meta-data
